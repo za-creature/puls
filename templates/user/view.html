@@ -1,0 +1,103 @@
+{% extends "public.html" %}
+
+{% block title %}
+    {{ user.name }}'s profile - MoarCofy
+{% endblock %}
+
+{% block heading %}
+    <div class="col-xs-12">
+        <h1>{{ user.name }}'s profile</h1>
+    </div>
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        {# User description #}
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+            <div class="thin-thumbnail">
+                <a class="square-thumb"
+                   href="#"
+                   style="background-image: url('{{ user.avatar_url }}')"
+                ></a>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-8 col-md-9 col-lg-10">
+            <dl class="dl-horizontal">
+                <dt>About me:</dt>
+                <dd>{{ user.description }}&nbsp;</dd>
+                <dt>Member since:</dt>
+                <dd>{{ user.created.strftime("%d %B %Y at %X") }}</dd>
+                <dt>Last seen:</dt>
+                <dd>{{ user.modified.strftime("%d %B %Y at %X") }}</dd>
+            </dl>
+        </div>
+
+        {# Photos #}
+        <div class="col-xs-12">
+            <h2>Recent photos</h2>
+        </div>
+        {% for photo in photos %}
+            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="thin-thumbnail">
+                    <a class="square-thumb"
+                       href="{{ url_for("public_photo", id=photo.id|string) }}"
+                       style="background-image: url('{{ photo.thumb_url }}')"
+                       title={{ photo.name }}
+                    ></a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-xs-12">
+                <p class="alert alert-warning">{{ user.name }} has not added any photos yet.</p>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+
+        {% if photos %}
+            <div class="col-xs-12">
+                <a class="btn btn-small btn-success pull-right"
+                   href="{{ url_for("public_photos", id=user.id|string) }}"
+                >
+                    <i class="glyphicon-pro glyphicon-pro-more"></i>&nbsp;
+                    View all
+                </a>
+            </div>
+        {% endif %}
+
+        {# Photo albums #}
+        <div class="col-xs-12">
+            <h2>Photo albums</h2>
+        </div>
+        {% for album in albums %}
+            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="thin-thumbnail">
+                    <a class="square-thumb"
+                       href="{{ url_for("public_album", id=album.id|string) }}"
+                       {% if album.photos|length %}
+                       style="background-image: url('{{ album.photos[0].thumb_url }}')"
+                       {% else %}
+                       style="background-image: url('{{ resource("img/album.png") }}')"
+                       {% endif %}
+                    ></a>
+                    <h3><a href="{{ url_for("public_album", id=album.id|string) }}">{{ album.name }}</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-xs-12">
+                <p class="alert alert-warning">{{ user.name }} doesn't have any albums.</p>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+
+        {% if albums %}
+            <div class="col-xs-12">
+                <a class="btn btn-small btn-success pull-right"
+                   href="{{ url_for("public_albums", id=user.id|string) }}"
+                >
+                    <i class="glyphicon-pro glyphicon-pro-more"></i>&nbsp;
+                    View all
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

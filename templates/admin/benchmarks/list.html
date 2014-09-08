@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+
+{% set active_page = "benchmarks" %}
+
+{% block heading %}
+    <ol class="breadcrumb">
+        <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
+        <li class="active">Benchmarks</li>
+    </ol>
+{% endblock %}
+
+{% block contents %}
+    <table class="table table-hover table-actions">
+        <tr>
+            <th>Name</th>
+            <th>Created on</th>
+            <th>Last modified</th>
+            <th class="actions">Actions</th>
+        </tr>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.created }}</td>
+                <td>{{ item.modified }}</td>
+                <td class="actions">
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-success"
+                           href="{{ url_for("edit_benchmark", id=item.id) }}">
+                            <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
+                            Edit
+                        </a>
+                        <a class="btn btn-danger confirm"
+                           href="{{ url_for("delete_benchmark", id=item.id) }}"
+                           data-title="Confirm delete"
+                           data-content="Are you sure you wish to delete this benchmark? This action can not be undone!"
+                        >
+                            <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
+                            Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr class="warning">
+                <td colspan="4">
+                    No benchmarks have been defined.
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr/>
+    <a class="btn btn-primary"
+       href="{{ url_for("add_benchmark") }}">
+        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+        New benchmark
+    </a>
+{% endblock %}

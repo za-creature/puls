@@ -1,0 +1,31 @@
+{% extends "public.html" %}
+
+{% block title %}
+    {{ user.name }}'s photos - MoarCofy
+{% endblock %}
+
+{% block heading %}
+    <div class="col-xs-12">
+        <h1>{{ user.name }}'s photos</h1>
+    </div>
+{% endblock %}
+
+{% block contents %}
+    <div class="row clearfix">
+        {% for photo in photos %}
+            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                <div class="thin-thumbnail">
+                    <a class="square-thumb"
+                       href="{{ url_for("public_photo", id=photo.id|string) }}"
+                       style="background-image: url('{{ photo.thumb_url }}')"
+                       title={{ photo.name }}
+                    ></a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-xs-12">
+                <p class="alert alert-warning">{{ user.name }} has not added any photos yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

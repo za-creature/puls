@@ -1,0 +1,39 @@
+/// <base path="../puls.less"/>
+.border-box {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+.border-radius(@radius: 4px) {
+    -webkit-border-radius: @radius;
+       -moz-border-radius: @radius;
+            border-radius: @radius;
+}
+
+.border-radius-top(@radius: 4px) {
+    -webkit-border-top-right-radius: @radius;
+     -webkit-border-top-left-radius: @radius;
+        -moz-border-radius-topright: @radius;
+         -moz-border-radius-topleft: @radius;
+            border-top-right-radius: @radius;
+             border-top-left-radius: @radius;
+}
+
+.box-shadow(@shadow: none) {
+    -webkit-box-shadow: @shadow;
+       -moz-box-shadow: @shadow;
+            box-shadow: @shadow;
+}
+
+.transition(@transition) {
+  -webkit-transition: @transition;
+     -moz-transition: @transition;
+          transition: @transition;
+}
+
+.webkit-cursor(@cursor) {
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        cursor: @cursor !important;
+    }
+}

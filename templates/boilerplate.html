@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block head %}
+            <meta charset="utf-8"/>
+            <base href="/"/>
+            <title>
+                {% block title %}Puls{% endblock %}
+            </title>
+            <link rel="shortcut icon" href="{{ resource("img/favicon.ico") }}"/>
+            <link rel="icon" type="image/png" href="{{ resource("img/favicon.png") }}"/>
+            <link rel="apple-touch-icon" href="{{ resource("img/favicon.png") }}"/>
+
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <!--[if IE]>
+                <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+            <![endif]-->
+
+            {% block css %}
+                {{ stylesheet("bootstrap") }}
+                {{ stylesheet("puls") }}
+            {% endblock %}
+
+            <!--[if lt IE 9]>
+                <script type="text/javascript" src="{{ resource("js/upstream/html5shiv.js") }}"></script>
+                <script type="text/javascript" src="{{ resource("js/upstream/respond.js") }}"></script>
+            <![endif]-->
+            <!--[if IE 10]>
+                <script type="text/javascript" src="{{ resource("js/upstream/ie10-width.js") }}"></script>
+            <![endif]-->
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+        {% endblock %}
+        {% block js %}
+            {{ javascript("monkeypatch") }}
+            {{ javascript("upstream/jquery") }}
+            {{ javascript("upstream/bootstrap") }}
+            {{ javascript("upstream/ios-orientation") }}
+        {% endblock %}
+    </body>
+</html>

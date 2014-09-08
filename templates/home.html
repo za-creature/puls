@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% set active_page = "home" %}
+
+{% block title %}
+    Puls
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="jumbotron">
+            <h1>Welcome!</h1>
+            <p>Puls helps you build a better desktop computer from aftermarket parts (<a href="{{ url_for("about") }}">See how</a>).</p>
+            <hr/>
+            <form action="{{ url_for("generate") }}" method="post">
+                <div class="form-group">
+                    <label>Just tell us what you'll be using it for:</label>
+                    <div class="btn-group btn-group-justified" data-toggle="buttons">
+                        {% for target in targets %}
+                            <label class="btn btn-success btn-lg
+                                          {% if loop.index == 0 %}active{% endif %}"
+                                   title="{{ target.description }}">
+                                <input type="radio" name="target" checked="checked"/>
+                                    <i class="glyphicon-pro glyphicon-pro-{{ target.icon }}"></i>&nbsp;
+                                     {{ target.name }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="budget">... and how much you want to spend:</label>
+                    <div class="input-group">
+                        <input class="form-control input-lg"
+                               type="number"
+                               min="0"
+                               max="1000000"
+                               step="1"
+                               placeholder="Maximum budget"
+                               id="budget"/>
+                        <input type="hidden" name="currency" value="RON"/>
+                        <div class="input-group-btn">
+                            <button type="button"
+                                    class="btn btn-warning dropdown-toggle btn-lg"
+                                    data-toggle="dropdown">
+                                <span class="currency">RON</span>*&nbsp;
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                {% for currency, rate in rates|dictsort %}
+                                    <li title="1 {{ currency }} = {{ (1/rate)|round(4) }} RON"><a href="#">{{ currency }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg">Build!</button>
+                </div>
+            </form>
+            <hr/>
+            <ul class="list-unstyled">
+                <li>* exchange rates are provided by the
+                    <a target="_blank" href="http://bnr.ro/">Romanian National Bank</a>
+                    (<a target="_blank" href="http://bnr.ro/nbrfxrates.xml">source</a>)
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

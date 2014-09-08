@@ -1,0 +1,220 @@
+{% extends "admin/base.html" %}
+
+{% set active_page = "classes" %}
+
+{% block heading %}
+    <ol class="breadcrumb">
+        <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
+        <li><a href="{{ url_for("manage_classes") }}">Classes</a></li>
+        <li class="active">
+            {% if item %}
+                {{ item.name }}
+                {% set action = url_for("edit_class", id=item.id) %}
+            {% else  %}
+                New
+                {% set action = url_for("add_class") %}
+            {% endif %}
+        </li>
+    </ol>
+{% endblock %}
+
+{% block contents %}
+    <form action="{{ action }}"
+          method="post"
+          enctype="multipart/form-data"
+          class="form-horizontal"
+          role="form"
+    >
+        {{ form.csrf_token }}
+
+        <div class="form-group
+                    {% if form.name.errors %}has-error{% endif %}">
+            <label class="col-sm-4 col-md-3 control-label"
+                   for="{{ form.name. id }}">
+                {{ form.name.label }}:
+            </label>
+            <div class="col-sm-8 col-md-9">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.name(class_="form-control") }}
+                    </div>
+                    <div class="col-md-6 help-block">
+                        {% for message in form.name.errors %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group
+                    {% if form.description.errors %}has-error{% endif %}">
+            <label class="col-sm-4 col-md-3 control-label"
+                   for="{{ form.description.id }}">
+                {{ form.description.label }}:
+            </label>
+            <div class="col-sm-8 col-md-9">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.description(class_="form-control", rows=6) }}
+                    </div>
+                    <div class="col-md-6 help-block">
+                        {% for message in form.description.errors %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group
+                    {% if form.photo.errors %}has-error{% endif %}">
+            <label class="col-sm-4 col-md-3 control-label"
+                   for="{{ form.photo.id }}">
+                {{ form.photo.label }}:
+            </label>
+            <div class="col-sm-8 col-md-9">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.photo(class_="form-control") }}
+                    </div>
+                    <div class="col-md-6 help-block">
+                        {% for message in form.photo.errors %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-4 col-md-3 control-label"
+                   for="{{ form.metadata.id }}-add">
+                {{ form.metadata.label }}:
+            </label>
+            <div class="col-sm-8 col-md-9">
+                <button type="button"
+                        id="{{ form.metadata.id }}-add"
+                        class="btn btn-warning btn-small">
+                    <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+                    New entry
+                </button>
+            </div>
+        </div>
+        <hr/>
+        {% for metadatum in form.metadata %}
+            <div id="{{ metadatum.id }}">
+                <div class="form-group
+                            {% if metadatum["name"].errors %}has-error{% endif %}">
+                    <label class="col-sm-4 col-md-3 control-label"
+                           for="{{ metadatum["name"].id }}">
+                        {{ metadatum["name"].label }}:
+                    </label>
+                    <div class="col-sm-8 col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ metadatum["name"](class_="form-control") }}
+                            </div>
+                            <div class="col-md-6 help-block">
+                                {% for message in metadatum["name"].errors %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group
+                            {% if metadatum["unit"].errors %}has-error{% endif %}">
+                    <label class="col-sm-4 col-md-3 control-label"
+                           for="{{ metadatum["unit"].id }}">
+                        {{ metadatum["unit"].label }}:
+                    </label>
+                    <div class="col-sm-8 col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ metadatum["unit"](class_="form-control") }}
+                            </div>
+                            <div class="col-md-6 help-block">
+                                {% for message in metadatum["unit"].errors %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group
+                            {% if metadatum["factor"].errors %}has-error{% endif %}">
+                    <label class="col-sm-4 col-md-3 control-label"
+                           for="{{ metadatum["factor"].id }}">
+                        {{ metadatum["factor"].label }}:
+                    </label>
+                    <div class="col-sm-8 col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ metadatum["factor"](class_="form-control") }}
+                            </div>
+                            <div class="col-md-6 help-block">
+                                {% for message in metadatum["factor"].errors %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group
+                            {% if metadatum["exponent"].errors %}has-error{% endif %}">
+                    <label class="col-sm-4 col-md-3 control-label"
+                           for="{{ metadatum["exponent"].id }}">
+                        {{ metadatum["exponent"].label }}:
+                    </label>
+                    <div class="col-sm-8 col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ metadatum["exponent"](class_="form-control") }}
+                            </div>
+                            <div class="col-md-6 help-block">
+                                {% for message in metadatum["exponent"].errors %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-md-offset-3
+                                col-sm-8 col-md-9">
+                        <button type="button"
+                                class="btn btn-danger"
+                                id="{{ metadatum.id }}-delete"
+                        >
+                            <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
+                            Delete entry
+                        </button>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        {% endfor %}
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-md-offset-3
+                        col-sm-8 col-md-9">
+                <button type="submit"
+                        class="btn btn-primary"
+                >
+                    <i class="glyphicon-pro glyphicon-pro-cloud-download"></i>&nbsp;
+                    Save
+                </button>&nbsp;
+                <a class="btn btn-default"
+                   href="{{ url_for("manage_classes") }}"
+                >
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

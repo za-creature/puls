@@ -1,0 +1,76 @@
+{% extends "public.html" %}
+
+{% block title %}
+    {{ photo.name }} - MoarCofy
+{% endblock %}
+
+{% block heading %}
+    <div class="col-xs-12">
+        <h1>{{ photo.name }}</h1>
+    </div>
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-sm-8 col-md-9">
+            <div class="thumbnail">
+                <img class="img-responsive" alt="{{ photo.name }}"
+                     src="{{ photo.web_url }}"/>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <div class="well well-sm">
+                {% if photo.description %}
+                    <p>{{ photo.description }}</p>
+                {% endif %}
+                <dl class="image-description">
+                    <dt>Width:</dt>
+                    <dd>{{ photo.width }}px</dd>
+                    <dt>Height:</dt>
+                    <dd>{{ photo.height }}px</dd>
+                    <dt>Type:</dt>
+                    <dd>{{ photo.mime }}</dd>
+                    <dt>Size:</dt>
+                    <dd>{{ photo.size|filesizeformat(True) }}</dd>
+                    <dt>Original:</dt>
+                    <dd><a href="{{ photo.orig_url }}">Download</a></dd>
+                </dl>
+                <div class="clearfix"></div>
+                {% for album in albums %}
+                    <h4>More from
+                        <a href="{{ url_for("public_album", id=album.id) }}">{{ album.name }}</a>
+                    </h4>
+                    <div id="album-{{ album.id|string }}"
+                         class="carousel slide"
+                         data-ride="carousel"
+                    >
+                        <div class="carousel-inner">
+                            {% set index = (album.photos.index(photo) + 1) % album.photos|length %}
+                            {% for p in album.photos %}
+                                <div class="item {% if loop.index - 1 == index %}active{% endif %}">
+                                    <a class="right-carousel-thumb"
+                                       style="background-image: url('{{ p.thumb_url }}')"
+                                       href="{{ url_for("public_photo", id=p.id) }}"
+                                       title="{{ p.name }}"></a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <a class="left carousel-control no-background"
+                           href="#album-{{ album.id|string }}"
+                           data-slide="prev"
+                        >
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a class="right carousel-control no-background"
+                           href="#album-{{ album.id|string }}"
+                           data-slide="next"
+                        >
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

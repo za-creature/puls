@@ -1,0 +1,35 @@
+<ul class="nav nav-pills nav-stacked">
+    <li{% if active_page == "home" %} class="active"{% endif %}>
+        <a href="{{ url_for("home") }}">
+            <i class="glyphicon glyphicon-home"></i>&nbsp;
+            Home
+        </a>
+    </li>
+    <li{% if active_page == "components" %} class="active"{% endif %}>
+        <a href="#">
+            <i class="glyphicon-pro glyphicon-pro-cogwheels"></i>&nbsp;
+            Components
+            <span class="badge pull-right">{{ component_count }}</span>
+        </a>
+    </li>
+    <li{% if active_page == "manufacturers" %} class="active"{% endif %}>
+        <a href="">
+            <i class="glyphicon-pro glyphicon-pro-blacksmith"></i>&nbsp;
+            Manufacturers
+            <span class="badge pull-right">{{ manufacturer_count }}</span>
+        </a>
+    </li>
+    <li{% if active_page == "suppliers" %} class="active"{% endif %}>
+        <a href="">
+            <i class="glyphicon glyphicon-shopping-cart"></i>&nbsp;
+            Suppliers
+            <span class="badge pull-right">{{ supplier_count }}</span>
+        </a>
+    </li>
+    <li{% if active_page == "about" %} class="active"{% endif %}>
+        <a href="{{ url_for("about") }}">
+            <i class="glyphicon glyphicon-question-sign"></i>&nbsp;
+            How does it work?
+        </a>
+    </li>
+</ul>

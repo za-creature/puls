@@ -1,0 +1,53 @@
+{% extends "boilerplate.html" %}
+
+{% block js %}
+    {{ super() }}
+    {{ javascript("ui") }}
+{% endblock %}
+
+{% block body %}
+    {% set active_page = active_page %}
+    {% include "admin/menu.html" %}
+    <div class="container menu-offset">
+        {% block heading %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1>{{ self.title() }}</h1>
+                </div>
+            </div>
+        {% endblock %}
+
+        {% include "flash.html" %}
+
+        {% block contents %}
+        {% endblock %}
+    </div>
+    <div class="modal fade"
+         id="confirm"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="confirm-title"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title"
+                        id="confirm-title"></h4>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">
+                        No
+                    </button>
+                    <button class="btn btn-primary" data-dismiss="modal">
+                        Yes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

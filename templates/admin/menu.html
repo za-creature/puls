@@ -1,0 +1,82 @@
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+                    data-toggle="collapse"
+                    data-target="#nav-menu">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for("dashboard") }}">
+                <i class="glyphicon-pro glyphicon-pro-cardio"></i>&nbsp;
+                Puls</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="nav-menu">
+            <ul class="nav navbar-nav">
+                <li{% if active_page == "components" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_components") }}">
+                    <i class="glyphicon-pro glyphicon-pro-cogwheels"></i>&nbsp;
+                    Components
+                </a></li>
+                <li{% if active_page == "benchmarks" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_benchmarks") }}">
+                    <i class="glyphicon-pro glyphicon-pro-charts"></i>&nbsp;
+                    Benchmarks
+                </a></li>
+                <li{% if active_page == "classes" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_classes") }}">
+                    <i class="glyphicon-pro glyphicon-pro-folder-open"></i>&nbsp;
+                    Classes
+                </a></li>
+                <li{% if active_page == "connectors" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_connectors") }}">
+                    <i class="glyphicon-pro glyphicon-pro-link"></i>&nbsp;
+                    Connectors
+                </a></li>
+                <li{% if active_page == "targets" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_targets") }}">
+                    <i class="glyphicon-pro glyphicon-pro-screenshot"></i>&nbsp;
+                    Targets
+                </a></li>
+                <li{% if active_page == "manufacturers" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_manufacturers") }}">
+                    <i class="glyphicon-pro glyphicon-pro-blacksmith"></i>&nbsp;
+                    Manufacturers
+                </a></li>
+                <li{% if active_page == "suppliers" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("manage_suppliers") }}">
+                    <i class="glyphicon-pro glyphicon-pro-shopping-cart"></i>&nbsp;
+                    Suppliers
+                </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li{% if active_page == "settings" %} class="active"{% endif %}
+                >
+                    <a href="{{ url_for("account_settings") }}">
+                    <i class="glyphicon glyphicon-wrench"></i>&nbsp;
+                    Settings
+                </a></li>
+                <li>
+                    <a href="{{ url_for("logout") }}"
+                       class="confirm"
+                       data-title="Confirm sign out"
+                       data-content="Are you sure you want to sign out?">
+                    <i class="glyphicon glyphicon-off"></i>&nbsp;
+                    Sign out
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,15 @@
+Thumbs.db
+.DS_Store
+*.pyc
+__pycache__
+\#*
+*~
+*.swp
+bootstrap.css
+puls.css
+*.map
+celerybeat-*
+backup/*
+static/photo/orig/*
+static/photo/thumb/*
+static/photo/web/*
