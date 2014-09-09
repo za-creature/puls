@@ -49,8 +49,8 @@
             <tr>
                 <td>{{ item.name }}</td>
                 <td>{{ item.meta|length }}</a></td>
-                <td>{{ item.created }}</td>
-                <td>{{ item.modified }}</td>
+                <td>{{ item.created|dateformat }}</td>
+                <td>{{ item.modified|dateformat }}</td>
                 <td class="actions">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-success"

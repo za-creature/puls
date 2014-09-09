@@ -1,5 +1,5 @@
 {% macro pagination(page, caption="Showing results {start} - {end} out of {total}. Jump to page:") %}
-    {% if page.total %}
+    {% if page.total and page.last > 1 %}
         {% if caption %}
             <div class="text-muted">{{ caption.format(start=page.start + 1,
                                                       end=page.end,
