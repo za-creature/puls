@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import auto_modified, Searchable
+from puls.models import auto_modified, Searchable, ReferenceField
 from puls import app
 
 import mongoengine as mge
@@ -22,6 +22,10 @@ class Target(app.db.Document, Searchable):
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
+
+
+class TargetField(ReferenceField):
+    reference_class = Target
 
 
 class TargetForm(flask_wtf.Form):

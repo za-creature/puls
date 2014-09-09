@@ -1,8 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified, Searchable
-from puls.compat import str
+from puls.models import (auto_modified, Searchable, ReferenceField,
+                         MultiReferenceField)
 from puls import app
 
 import wtforms.fields.html5 as fmm
@@ -28,23 +28,12 @@ class Manufacturer(app.db.Document, Searchable):
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class ManufacturerField(wtf.TextField):
-    """Holds a reference to a Manufacturer object. """
-    def process_data(self, value):
-        # process initialization data
-        if isinstance(value, Manufacturer):
-            self.data = value
-        else:
-            self.data = None
+class ManufacturerField(ReferenceField):
+    reference_class = Manufacturer
 
-    def process_formdata(self, valuelist):
-        if valuelist:
-            try:
-                self.data = Manufacturer.objects.get(id=str(valuelist[0]))
-            except Manufacturer.DoesNotExist:
-                raise wtf.ValidationError("Invalid manufacturer id.")
-        else:
-            self.data = None
+
+class MultiManufacturerField(MultiReferenceField):
+    reference_class = Manufacturer
 
 
 class ManufacturerForm(flask_wtf.Form):

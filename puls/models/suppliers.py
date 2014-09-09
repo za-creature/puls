@@ -1,8 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified, Searchable
-from puls.compat import str
+from puls.models import auto_modified, Searchable, ReferenceField
 from puls import app
 
 import wtforms.fields.html5 as fmm
@@ -28,23 +27,8 @@ class Supplier(app.db.Document, Searchable):
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class SupplierField(wtf.TextField):
-    """Holds a reference to a Supplier object. """
-    def process_data(self, value):
-        # process initialization data
-        if isinstance(value, Supplier):
-            self.data = value
-        else:
-            self.data = None
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            try:
-                self.data = Supplier.objects.get(id=str(valuelist[0]))
-            except Supplier.DoesNotExist:
-                raise wtf.ValidationError("Invalid supplier id.")
-        else:
-            self.data = None
+class SupplierField(ReferenceField):
+    reference_class = Supplier
 
 
 class SupplierForm(flask_wtf.Form):

@@ -1,8 +1,9 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
+from puls.models.targets import Target, TargetField
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified, Searchable
-from puls.compat import str
+from puls.models import (auto_modified, Searchable, ReferenceField,
+                         MultiReferenceField)
 from puls import app
 
 import mongoengine as mge
@@ -11,12 +12,36 @@ import datetime
 import wtforms as wtf
 
 
+class MetadatumWeightSpec(app.db.EmbeddedDocument):
+    target = mge.ReferenceField(Target, required=True)
+    weight = mge.FloatField(required=True)
+
+
+class MetadatumWeightSpecForm(app.db.EmbeddedDocument):
+    target = TargetField("Target", [wtf.validators.InputRequired()])
+    weight = wtf.FloatField("Weight", [wtf.validators.InputRequired()])
+
+
 class Metadatum(app.db.EmbeddedDocument):
     name = mge.StringField(required=True, max_length=64)
     unit = mge.StringField(required=True, max_length=16)
 
     factor = mge.FloatField(default=1)
     exponent = mge.FloatField(default=1)
+    weights = mge.ListField(mge.EmbeddedDocumentField(MetadatumWeightSpec))
+
+
+class MetadatumForm(flask_wtf.Form):
+    name = wtf.StringField("Name", [wtf.validators.InputRequired(),
+                                    wtf.validators.Length(max=64)])
+    unit = wtf.StringField("Unit", [wtf.validators.InputRequired(),
+                                    wtf.validators.Length(max=16)])
+    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
+    exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
+
+    weights = wtf.FieldList(wtf.FormField(MetadatumWeightSpecForm),
+                            default=[MetadatumWeightSpec(target=item, weight=0)
+                                     for item in Target.objects])
 
 
 @auto_modified
@@ -36,46 +61,17 @@ class Class(app.db.Document, Searchable):  # this is so meta
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class ClassField(wtf.HiddenField):
-    """Holds a reference to a Class object."""
-    @classmethod
-    def widget(cls, self, **kwargs):
-        if "class_" not in kwargs:
-            kwargs["class_"] = ""
-        kwargs["class_"] += " combobox"
-        return super(ClassField, self).widget(kwargs)
-
-    def process_data(self, value):
-        # process initialization data
-        if isinstance(value, Class):
-            self.data = value
-        else:
-            self.data = None
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            try:
-                self.data = Class.objects.get(id=str(valuelist[0]))
-            except Class.DoesNotExist:
-                raise wtf.ValidationError("Invalid class id.")
-        else:
-            self.data = None
+class ClassField(ReferenceField):
+    reference_class = Class
 
 
-class MetadataForm(flask_wtf.Form):
-    name = wtf.StringField("Name", [wtf.validators.Required(),
-                                    wtf.validators.Length(max=64)])
-    unit = wtf.StringField("Unit", [wtf.validators.Required(),
-                                    wtf.validators.Length(max=16)])
-    factor = wtf.FloatField("Factor", [wtf.validators.Required()])
-    exponent = wtf.FloatField("Exponent", [wtf.validators.Required()])
+class MultiClassField(MultiReferenceField):
+    reference_class = Class
 
 
 class ClassForm(flask_wtf.Form):
-    name = wtf.TextField("Name", [wtf.validators.Required(),
+    name = wtf.TextField("Name", [wtf.validators.InputRequired(),
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
     photo = PhotoField("Photo", [wtf.validators.InputRequired()])
-
-    metadata = wtf.FieldList(wtf.FormField(MetadataForm), min_entries=1)

@@ -6,15 +6,14 @@
     <ol class="breadcrumb">
         <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
         <li><a href="{{ url_for("manage_targets") }}">Targets</a></li>
-        <li class="active">
-            {% if item %}
-                {{ item.name }}
-                {% set action = url_for("edit_target", id=item.id) %}
-            {% else  %}
-                New
-                {% set action = url_for("add_target") %}
-            {% endif %}
-        </li>
+        {% if item %}
+            {% set action = url_for("edit_target", id=item.id) %}
+            <li><a href="{{ action }}">{{ item.name }}</a></li>
+            <li class="active">Edit</li>
+        {% else %}
+            {% set action = url_for("add_target") %}
+            <li class="active">New</li>
+        {% endif %}
     </ol>
 {% endblock %}
 
@@ -29,10 +28,7 @@
 
         <div class="form-group
                     {% if form.name.errors %}has-error{% endif %}">
-            <label class="col-sm-4 col-md-3 control-label"
-                   for="{{ form.name. id }}">
-                {{ form.name.label }}:
-            </label>
+            {{ form.name.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
@@ -49,10 +45,7 @@
 
         <div class="form-group
                     {% if form.icon.errors %}has-error{% endif %}">
-            <label class="col-sm-4 col-md-3 control-label"
-                   for="{{ form.icon.id }}">
-                {{ form.icon.label }}:
-            </label>
+            {{ form.icon.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
@@ -69,10 +62,7 @@
 
         <div class="form-group
                     {% if form.description.errors %}has-error{% endif %}">
-            <label class="col-sm-4 col-md-3 control-label"
-                   for="{{ form.description.id }}">
-                {{ form.description.label }}:
-            </label>
+            {{ form.description.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
@@ -87,6 +77,7 @@
             </div>
         </div>
 
+        <hr/>
         <div class="form-group">
             <div class="col-sm-offset-4 col-md-offset-3
                         col-sm-8 col-md-9">

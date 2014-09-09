@@ -1,11 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models.manufacturers import Manufacturer, ManufacturerField
+from puls.models.manufacturers import Manufacturer, MultiManufacturerField
 from puls.models.connectors import ConnectorSpec, ConnectorSpecForm
-from puls.models.suppliers import Supplier, SupplierField
-from puls.models.classes import Class, ClassField
+from puls.models.suppliers import Supplier
+from puls.models.classes import Class, ClassField, MultiClassField
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified, Searchable
+from puls.models import (auto_modified, Searchable, ReferenceField,
+                         MultiReferenceField)
 from puls.compat import str
 from puls import app
 
@@ -16,7 +17,7 @@ import wtforms as wtf
 
 
 @auto_modified
-class ExternalComponent(app.db.Document):
+class ExternalComponent(app.db.Document, Searchable):
     meta = {"indexes": [
         [("supplier", 1), ("name", "text")],
     ]}
@@ -37,9 +38,36 @@ class ExternalComponent(app.db.Document):
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
+    @classmethod
+    def search(self, query, supplier, limit=100):
+        col = self._get_collection()
+        result = col.find({"$text": {"$search": query},
+                           "supplier": str(supplier.id)},
+                          {"score": {"$meta": "textScore"}}) \
+                    .sort([("score", {"$meta": "textScore"})]) \
+                    .limit(limit)
+        return self.NonIterableList([self._from_son(item) for item in result])
+
+
+class ExternalComponentField(ReferenceField):
+    reference_class = ExternalComponent
+
+
+class ComponentMetadataSpec(app.db.EmbeddedDocument):
+    cls = mge.ReferenceField(Class)
+    values = mge.DictField(mge.FloatField)
+
+
+class ComponentMetadataForm(flask_wtf.Form):
+    cls = ClassField("Class")
+
 
 @auto_modified
 class Component(app.db.Document, Searchable):
+    meta = {"indexes": [
+        [("name", "text"), ("description", "text")],
+    ]}
+
     name = mge.StringField(required=True, max_length=256)
     description = mge.StringField(default="", max_length=4096)
     photo = mge.ReferenceField(Photo, reverse_delete_rule=mge.NULLIFY)
@@ -50,31 +78,20 @@ class Component(app.db.Document, Searchable):
                                                      reverse_delete_rule=mge.PULL))  # noqa
     connectors = mge.ListField(mge.EmbeddedDocumentField(ConnectorSpec))
 
-    suppliers = mge.ListField(mge.ReferenceField(ExternalComponent))
-    metadata = mge.MapField(mge.FloatField())
+    external = mge.ListField(mge.ReferenceField(ExternalComponent))
+    metadata = mge.ListField(mge.EmbeddedDocumentField(ComponentMetadataSpec))
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class ComponentField(wtf.TextField):
-    """Holds a reference to a Component object. """
-    def process_data(self, value):
-        # process initialization data
-        if isinstance(value, Component):
-            self.data = value
-        else:
-            self.data = None
+class ComponentField(ReferenceField):
+    reference_class = Component
 
-    def process_formdata(self, valuelist):
-        if valuelist:
-            try:
-                self.data = Component.objects.get(id=str(valuelist[0]))
-            except Component.DoesNotExist:
-                raise wtf.ValidationError("Invalid component id.")
-        else:
-            self.data = None
+
+class MultiComponentField(MultiReferenceField):
+    reference_class = Component
 
 
 class ComponentForm(flask_wtf.Form):
@@ -84,9 +101,8 @@ class ComponentForm(flask_wtf.Form):
                                     [wtf.validators.Length(max=4096)])
     photo = PhotoField("Photo", [wtf.validators.InputRequired()])
 
-    classes = wtf.FieldList(ClassField("Classes"), min_entries=1)
-    manufacturers = wtf.FieldList(ManufacturerField("Manufacturers"),
-                                  min_entries=1)
-    connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm),
-                               min_entries=1)
-    connectors = wtf.FieldList(SupplierField("Suppliers"), min_entries=1)
+    classes = MultiClassField("Classes", [wtf.validators.Required])
+    manufacturers = MultiManufacturerField("Manufacturers",
+                                           [wtf.validators.Required])
+    connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm))
+    external = wtf.FieldList(ExternalComponentField())

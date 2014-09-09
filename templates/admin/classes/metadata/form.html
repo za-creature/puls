@@ -1,20 +1,35 @@
 {% extends "admin/base.html" %}
 
-{% set active_page = "manufacturers" %}
+{% set active_page = "classes" %}
 
 {% block heading %}
     <ol class="breadcrumb">
         <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
-        <li><a href="{{ url_for("manage_manufacturers") }}">Manufacturers</a></li>
+        <li><a href="{{ url_for("manage_classes") }}">Classes</a></li>
+        <li><a href="{{ url_for("edit_class", id=cls.id) }}">{{ cls.name }}</a></li>
+        <li><a href="{{ url_for("manage_class_meta", id=cls.id) }}">Metadata</a></li>
         {% if item %}
-            {% set action = url_for("edit_manufacturer", id=item.id) %}
+            {% set action = url_for("edit_class_meta", id=cls.id, name=item.name) %}
             <li><a href="{{ action }}">{{ item.name }}</a></li>
             <li class="active">Edit</li>
         {% else %}
-            {% set action = url_for("add_manufacturer") %}
+            {% set action = url_for("add_class_meta", id=cls.id) %}
             <li class="active">New</li>
         {% endif %}
     </ol>
+    <ul class="nav nav-tabs" role="tablist">
+        <li><a href="{{ url_for("edit_class", id=cls.id) }}">
+            General
+        </a></li>
+        <li><a href="{{ url_for("manage_class_meta", id=cls.id) }}">
+            Metadata
+        </a></li>
+        <li class="active"><a>
+            <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+            New meta entry
+        </a></li>
+    </ul>
+    <br/>
 {% endblock %}
 
 {% block contents %}
@@ -25,7 +40,6 @@
           role="form"
     >
         {{ form.csrf_token }}
-
         <div class="form-group
                     {% if form.name.errors %}has-error{% endif %}">
             {{ form.name.label(class_="col-sm-4 col-md-3 control-label") }}
@@ -44,15 +58,15 @@
         </div>
 
         <div class="form-group
-                    {% if form.description.errors %}has-error{% endif %}">
-            {{ form.description.label(class_="col-sm-4 col-md-3 control-label") }}
+                    {% if form.unit.errors %}has-error{% endif %}">
+            {{ form.unit.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form.description(class_="form-control", rows=6) }}
+                        {{ form.unit(class_="form-control") }}
                     </div>
                     <div class="col-md-6 help-block">
-                        {% for message in form.description.errors %}
+                        {% for message in form.unit.errors %}
                             <p>{{ message }}</p>
                         {% endfor %}
                     </div>
@@ -61,15 +75,15 @@
         </div>
 
         <div class="form-group
-                    {% if form.photo.errors %}has-error{% endif %}">
-            {{ form.photo.label(class_="col-sm-4 col-md-3 control-label") }}
+                    {% if form.factor.errors %}has-error{% endif %}">
+            {{ form.factor.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form.photo(class_="form-control") }}
+                        {{ form.factor(class_="form-control") }}
                     </div>
                     <div class="col-md-6 help-block">
-                        {% for message in form.photo.errors %}
+                        {% for message in form.factor.errors %}
                             <p>{{ message }}</p>
                         {% endfor %}
                     </div>
@@ -78,15 +92,15 @@
         </div>
 
         <div class="form-group
-                    {% if form.url.errors %}has-error{% endif %}">
-            {{ form.url.label(class_="col-sm-4 col-md-3 control-label") }}
+                    {% if form.exponent.errors %}has-error{% endif %}">
+            {{ form.exponent.label(class_="col-sm-4 col-md-3 control-label") }}
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form.url(class_="form-control") }}
+                        {{ form.exponent(class_="form-control") }}
                     </div>
                     <div class="col-md-6 help-block">
-                        {% for message in form.url.errors %}
+                        {% for message in form.exponent.errors %}
                             <p>{{ message }}</p>
                         {% endfor %}
                     </div>
@@ -105,7 +119,7 @@
                     Save
                 </button>&nbsp;
                 <a class="btn btn-default"
-                   href="{{ url_for("manage_manufacturers") }}"
+                   href="{{ url_for("manage_class_meta", id=cls.id) }}"
                 >
                     Cancel
                 </a>

@@ -84,37 +84,6 @@ class ReferenceField(wtf.HiddenField):
             self.data = None
 
 
-class MultiReferenceField(wtf.HiddenField):
-    """Holds a reference to zero or more mongoengine objects of the same class
-    """
-    @classmethod
-    def widget(cls, self, **kwargs):
-        if "class_" not in kwargs:
-            kwargs["class_"] = ""
-        kwargs["class_"] += " combobox"
-        kwargs["data-multiple"] = True
-        return super(MultiReferenceField, self).widget(kwargs)
-
-    def process_data(self, valuelist):
-        # process initialization data
-        self.data = []
-        try:
-            for value in valuelist:
-                if isinstance(value, self.reference_class):
-                    self.data.append(value)
-        except TypeError:
-            """valuelist is not iterable; ignore"""
-
-    def process_formdata(self, valuelist):
-        self.data = []
-        if valuelist:
-            try:
-                for id in str(valuelist[0]).split(","):
-                    self.data.append(self.reference_class.objects.get(id=id))
-            except self.reference_class.DoesNotExist:
-                raise wtf.ValidationError("Invalid class id(s).")
-
-
 def auto_modified(cls):
     def callback(sender, document):
         document.modified = datetime.now()
