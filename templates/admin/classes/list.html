@@ -10,6 +10,12 @@
 {% endblock %}
 
 {% block contents %}
+    <a class="btn btn-primary"
+       href="{{ url_for("add_class") }}">
+        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+        New class
+    </a>
+    <hr/>
     <table class="table table-hover table-actions">
         <tr>
             <th>Name</th>
@@ -18,7 +24,7 @@
             <th>Last modified</th>
             <th class="actions">Actions</th>
         </tr>
-        {% for item in items %}
+        {% for item in page %}
             <tr>
                 <td>{{ item.name }}</td>
                 <td>{{ item.meta|length }}</a></td>
@@ -50,10 +56,5 @@
             </tr>
         {% endfor %}
     </table>
-    <hr/>
-    <a class="btn btn-primary"
-       href="{{ url_for("add_class") }}">
-        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
-        New class
-    </a>
+    {{ macros.pagination(page) }}
 {% endblock %}

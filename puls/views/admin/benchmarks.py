@@ -1,17 +1,33 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Benchmark, BenchmarkForm
-from puls import app
+from puls.models import Benchmark, Benchmarks, BenchmarkForm
+from puls.compat import unquote_plus
+from puls import app, paginate
 
-import urllib
 import flask
 
 
-@app.route("/admin/benchmarks/")
+@app.route("/admin/benchmarks/", endpoint="manage_benchmarks")
+@app.route("/admin/benchmarks/<int:page>/")
 @app.template("admin/benchmarks/list.html")
 @app.logged_in
-def manage_benchmarks():
-    return {"items": Benchmark.objects.filter()}
+def list_benchmarks(page=1):
+    return {"page": paginate(Benchmark.objects, page, 20)}
+
+
+@app.route("/admin/benchmarks/search/")
+@app.logged_in
+def search_benchmarks():
+    query = flask.request.args.get("term", "")
+    return flask.jsonify({"results": [{
+        "id": str(item["_id"]),
+        "text": str(item["name"])
+    }
+        for item in Benchmarks.find({"$text": {"$search": query}},
+                                    {"score": {"$meta": "textScore"}})
+                              .sort([("score", {"$meta": "textScore"})])
+                              .limit(100)
+    ]})
 
 
 @app.route("/admin/benchmarks/new", methods=["GET", "POST"],
@@ -23,10 +39,7 @@ def edit_benchmark(id=None):
     if id is None:
         item = None
     else:
-        try:
-            item = Benchmark.objects.get(id=urllib.unquote_plus(id))
-        except Benchmark.DoesNotExist:
-            return flask.abort(404)
+        item = Benchmark.objects.get_or_404(id=unquote_plus(id))
 
     form = BenchmarkForm(obj=item)
 
@@ -45,11 +58,8 @@ def edit_benchmark(id=None):
 @app.route("/admin/benchmarks/<id>/delete/")
 @app.logged_in
 def delete_benchmark(id):
-    try:
-        item = Benchmark.objects.get(id=urllib.unquote_plus(id))
+    item = Benchmark.objects.get_or_404(id=unquote_plus(id))
+    item.delete()
 
-        item.delete()
-        flask.flash("Your benchmark has been deleted!", "warning")
-        return flask.redirect(flask.url_for("manage_benchmarks"))
-    except Benchmark.DoesNotExist:
-        return flask.abort(404)
+    flask.flash("Your benchmark has been deleted!", "warning")
+    return flask.redirect(flask.url_for("manage_benchmarks"))

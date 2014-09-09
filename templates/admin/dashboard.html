@@ -7,5 +7,7 @@
 {% endblock %}
 
 {% block contents %}
-    yo
+    <input type="hidden"
+           class="form-control combobox"
+           data-url="{{ url_for("search_classes") }}"/>
 {% endblock %}

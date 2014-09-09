@@ -24,6 +24,9 @@ class Target(app.db.Document):
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
+Targets = Target._get_collection()
+
+
 class TargetForm(flask_wtf.Form):
     name = wtf.TextField("Name", [wtf.validators.Required(),
                                   wtf.validators.Length(max=256)])

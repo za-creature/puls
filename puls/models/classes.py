@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
 from puls.models import auto_modified
+from puls.compat import str
 from puls import app
 
 import mongoengine as mge
@@ -35,6 +36,35 @@ class Class(app.db.Document):  # this is so meta
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
+Classes = Class._get_collection()
+
+
+class ClassField(wtf.HiddenField):
+    """Holds a reference to a Class object."""
+    @classmethod
+    def widget(cls, self, **kwargs):
+        if "class_" not in kwargs:
+            kwargs["class_"] = ""
+        kwargs["class_"] += " combobox"
+        return super(ClassField, self).widget(kwargs)
+
+    def process_data(self, value):
+        # process initialization data
+        if isinstance(value, Class):
+            self.data = value
+        else:
+            self.data = None
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = Class.objects.get(id=str(valuelist[0]))
+            except Class.DoesNotExist:
+                raise wtf.ValidationError("Invalid class id.")
+        else:
+            self.data = None
+
+
 class MetadataForm(flask_wtf.Form):
     name = wtf.StringField("Name", [wtf.validators.Required(),
                                     wtf.validators.Length(max=64)])
@@ -49,8 +79,6 @@ class ClassForm(flask_wtf.Form):
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
-
-    metadata = wtf.FieldList(wtf.FormField(MetadataForm), min_entries=1)
-
     photo = PhotoField("Photo", [wtf.validators.InputRequired()])
 
+    metadata = wtf.FieldList(wtf.FormField(MetadataForm), min_entries=1)

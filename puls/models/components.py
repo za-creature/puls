@@ -1,15 +1,18 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models.manufacturers import Manufacturer
-from puls.models.connectors import ConnectorSpec
-from puls.models.suppliers import Supplier
-from puls.models.classes import Class
-from puls.models.photos import Photo
+from puls.models.manufacturers import Manufacturer, ManufacturerField
+from puls.models.connectors import ConnectorSpec, ConnectorSpecForm
+from puls.models.suppliers import Supplier, SupplierField
+from puls.models.classes import Class, ClassField
+from puls.models.photos import Photo, PhotoField
 from puls.models import auto_modified
+from puls.compat import str
 from puls import app
 
 import mongoengine as mge
+import flask_wtf
 import datetime
+import wtforms as wtf
 
 
 @auto_modified
@@ -48,12 +51,45 @@ class Component(app.db.Document):
     connectors = mge.ListField(mge.EmbeddedDocumentField(ConnectorSpec))
 
     suppliers = mge.ListField(mge.ReferenceField(ExternalComponent))
-    metadata = mge.DictField()
+    metadata = mge.MapField(mge.FloatField())
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class ComponentField(flask_wtf.file.FileField):
+Components = Component._get_collection()
+
+
+class ComponentField(wtf.TextField):
     """Holds a reference to a Component object. """
+    def process_data(self, value):
+        # process initialization data
+        if isinstance(value, Component):
+            self.data = value
+        else:
+            self.data = None
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = Component.objects.get(id=str(valuelist[0]))
+            except Component.DoesNotExist:
+                raise wtf.ValidationError("Invalid component id.")
+        else:
+            self.data = None
+
+
+class ComponentForm(flask_wtf.Form):
+    name = wtf.TextField("Name", [wtf.validators.Required(),
+                                  wtf.validators.Length(max=256)])
+    description = wtf.TextAreaField("Description",
+                                    [wtf.validators.Length(max=4096)])
+    photo = PhotoField("Photo", [wtf.validators.InputRequired()])
+
+    classes = wtf.FieldList(ClassField("Classes"), min_entries=1)
+    manufacturers = wtf.FieldList(ManufacturerField("Manufacturers"),
+                                  min_entries=1)
+    connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm),
+                               min_entries=1)
+    connectors = wtf.FieldList(SupplierField("Suppliers"), min_entries=1)

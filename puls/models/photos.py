@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.models import on, has_triggers
 from puls.helpers import resource
+from puls.compat import str
 from puls import app
 
 import flask_wtf.file
@@ -114,12 +115,7 @@ class PhotoField(flask_wtf.file.FileField):
         if not valuelist:
             self.data = None
         elif isinstance(valuelist[0], werkzeug.FileStorage):
-            if valuelist[0].content_length:
-                # we've got a file upload; attempt to convert it
-                self.data = self.process_upload(valuelist[0])
-            else:
-                # browsers sometimes send a 0 byte file
-                self.data = None
+            self.data = self.process_upload(valuelist[0])
         else:
             # assume an existing photo id has been sent
             try:
@@ -152,7 +148,7 @@ class PhotoField(flask_wtf.file.FileField):
                 raise ValueError
 
             # get metadata
-            pieces = out.split(" ")
+            pieces = str(out).split(" ")
             photo.format = pieces[1].lower()
             if photo.format == "jpg":
                 photo.format = "jpeg"
@@ -196,6 +192,7 @@ class PhotoField(flask_wtf.file.FileField):
             photo.save()
             return photo
         except Exception:
+            logging.exception("FUT")
             # delete temp file(s)
             photo.delete_files()
             raise wtf.ValidationError("Invalid or corrupt image.")

@@ -39,4 +39,24 @@ jQuery(function($)
             });
         }
     });
+
+    $(".combobox").each(function() {
+        var $this = $(this);
+        if($this.is("[data-url]"))
+            $this.select2({
+                minimumInputLength: 1,
+                multiple: $this.prop("data-multiple"),
+                ajax: {
+                    url: $this.attr("data-url"),
+                    dataType: 'json',
+                    type: "GET",
+                    quietMillis: 200,
+                    data: function(term) { return {query: term}; },
+                    results: function(data) { return data; }
+                }
+            });
+        else {
+            $this.select2();
+        }
+    });
 });

@@ -29,7 +29,7 @@ def logout():
 def bootstrap():
     # check that this is a fresh install (not already bootstrapped)
     if Admin.objects.first():
-        return flask.abort(403)
+        flask.abort(403)
 
     # build hashed password
     password = "".join([app.config["ACCOUNT_SALT"],

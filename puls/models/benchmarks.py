@@ -1,9 +1,9 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models.applications import Application
-from puls.models.components import Component
+from puls.models.components import Component, ComponentField
 from puls.models.classes import Class
 from puls.models import auto_modified
+from puls import app
 
 import mongoengine as mge
 import flask_wtf
@@ -12,12 +12,12 @@ import wtforms as wtf
 
 
 class BenchmarkEntry(app.db.EmbeddedDocument):
-    component = ReferenceField(Component, required=True)
-    score = FloatField(required=True)
+    component = mge.ReferenceField(Component, required=True)
+    score = mge.FloatField(required=True)
 
 
 @auto_modified
-class Benchmark(app.db.Document):  # this is so meta
+class Benchmark(app.db.Document):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -31,11 +31,19 @@ class Benchmark(app.db.Document):  # this is so meta
 
     factor = mge.FloatField(required=True)  # currently always 0
     exponent = mge.FloatField(required=True)  # currently always 1
-    scores = ListField(EmbeddedDocumentField(BenchmarkEntry))
+    entries = mge.ListField(mge.EmbeddedDocumentField(BenchmarkEntry))
 
     # dates
-    created = DateTimeField(default=datetime.now)
-    modified = DateTimeField(default=datetime.now)
+    created = mge.DateTimeField(default=datetime.datetime.now)
+    modified = mge.DateTimeField(default=datetime.datetime.now)
+
+
+Benchmarks = Benchmark._get_collection()
+
+
+class BenchmarkEntryForm(flask_wtf.Form):
+    component = ComponentField("Component", [wtf.validators.Required()])
+    score = wtf.FloatField("Score", [wtf.validators.Required()])
 
 
 class BenchmarkForm(flask_wtf.Form):
@@ -46,4 +54,4 @@ class BenchmarkForm(flask_wtf.Form):
 
     factor = wtf.FloatField("Factor", [wtf.validators.Required()])
     exponent = wtf.FloatField("Exponent", [wtf.validators.Required()])
-    scores = wtf.FieldList(wtf.FormField(BenchmarkEntryForm), min_entries=1)
+    entries = wtf.FieldList(wtf.FormField(BenchmarkEntryForm), min_entries=1)

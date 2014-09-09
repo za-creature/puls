@@ -42,3 +42,7 @@ def stylesheet(filename=None):
 def resource(filename):
     """Returns the URL a static resource, including versioning."""
     return "/static/{0}/{1}".format(app.config["VERSION"], filename)
+
+
+def dateformat(date, format="%a, %d %B %Y, %I:%M %p"):
+    return date.strftime(format)

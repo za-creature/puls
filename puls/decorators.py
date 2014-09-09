@@ -40,7 +40,7 @@ def logged_in(f):
                 return flask.redirect(flask.url_for("login"))
         else:
             return f(*args, **kwargs)
-        return flask.abort(403)
+        flask.abort(403)
     return wrapper
 
 

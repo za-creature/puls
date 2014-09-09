@@ -10,18 +10,27 @@
 {% endblock %}
 
 {% block contents %}
+    <a class="btn btn-primary"
+       href="{{ url_for("add_manufacturer") }}">
+        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+        New manufacturer
+    </a>
+    <hr/>
     <table class="table table-hover table-actions">
         <tr>
             <th>Name</th>
+            <th>Website</th>
             <th>Created on</th>
             <th>Last modified</th>
             <th class="actions">Actions</th>
         </tr>
-        {% for item in items %}
+        {% for item in page %}
             <tr>
                 <td>{{ item.name }}</td>
-                <td>{{ item.created }}</td>
-                <td>{{ item.modified }}</td>
+                <td><a href="{{ item.url }}"
+                       target="_blank">{{ item.url }}</a></td>
+                <td>{{ item.created|dateformat }}</td>
+                <td>{{ item.modified|dateformat }}</td>
                 <td class="actions">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-success"
@@ -42,16 +51,11 @@
             </tr>
         {% else %}
             <tr class="warning">
-                <td colspan="4">
+                <td colspan="5">
                     No manufacturers have been defined.
                 </td>
             </tr>
         {% endfor %}
     </table>
-    <hr/>
-    <a class="btn btn-primary"
-       href="{{ url_for("add_manufacturer") }}">
-        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
-        New manufacturer
-    </a>
+    {{ macros.pagination(page) }}
 {% endblock %}

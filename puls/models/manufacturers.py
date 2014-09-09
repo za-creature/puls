@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
 from puls.models import auto_modified
+from puls.compat import str
 from puls import app
 
 import wtforms.fields.html5 as fmm
@@ -22,10 +23,31 @@ class Manufacturer(app.db.Document):
     photo = mge.ReferenceField(Photo, reverse_delete_rule=mge.NULLIFY)
     url = mge.StringField(required=True, default="")
 
-
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
+
+
+Manufacturers = Manufacturer._get_collection()
+
+
+class ManufacturerField(wtf.TextField):
+    """Holds a reference to a Manufacturer object. """
+    def process_data(self, value):
+        # process initialization data
+        if isinstance(value, Manufacturer):
+            self.data = value
+        else:
+            self.data = None
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = Manufacturer.objects.get(id=str(valuelist[0]))
+            except Manufacturer.DoesNotExist:
+                raise wtf.ValidationError("Invalid manufacturer id.")
+        else:
+            self.data = None
 
 
 class ManufacturerForm(flask_wtf.Form):

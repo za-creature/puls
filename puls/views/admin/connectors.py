@@ -1,17 +1,33 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Connector, ConnectorForm
-from puls import app
+from puls.models import Connector, Connectors, ConnectorForm
+from puls.compat import unquote_plus
+from puls import app, paginate
 
-import urllib
 import flask
 
 
-@app.route("/admin/connectors/")
+@app.route("/admin/connectors/", endpoint="manage_connectors")
+@app.route("/admin/connectors/<int:page>/")
 @app.template("admin/connectors/list.html")
 @app.logged_in
-def manage_connectors():
-    return {"items": Connector.objects.filter()}
+def list_connectors(page=1):
+    return {"page": paginate(Connector.objects, page, 20)}
+
+
+@app.route("/admin/connectors/search/")
+@app.logged_in
+def search_connectors():
+    query = flask.request.args.get("term", "")
+    return flask.jsonify({"results": [{
+        "id": str(item["_id"]),
+        "text": str(item["name"])
+    }
+        for item in Connectors.find({"$text": {"$search": query}},
+                                    {"score": {"$meta": "textScore"}})
+                              .sort([("score", {"$meta": "textScore"})])
+                              .limit(100)
+    ]})
 
 
 @app.route("/admin/connectors/new", methods=["GET", "POST"],
@@ -23,10 +39,7 @@ def edit_connector(id=None):
     if id is None:
         item = None
     else:
-        try:
-            item = Connector.objects.get(id=urllib.unquote_plus(id))
-        except Connector.DoesNotExist:
-            return flask.abort(404)
+        item = Connector.objects.get_or_404(id=unquote_plus(id))
 
     form = ConnectorForm(obj=item)
 
@@ -45,11 +58,8 @@ def edit_connector(id=None):
 @app.route("/admin/connectors/<id>/delete/")
 @app.logged_in
 def delete_connector(id):
-    try:
-        item = Connector.objects.get(id=urllib.unquote_plus(id))
+    item = Connector.objects.get_or_404(id=unquote_plus(id))
+    item.delete()
 
-        item.delete()
-        flask.flash("Your connector has been deleted!", "warning")
-        return flask.redirect(flask.url_for("manage_connectors"))
-    except Connector.DoesNotExist:
-        return flask.abort(404)
+    flask.flash("Your connector has been deleted!", "warning")
+    return flask.redirect(flask.url_for("manage_connectors"))

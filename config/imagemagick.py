@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 
 IMAGEMAGICK_IDENTIFY = "identify"
-IMAGEMAGICK_CONVERT = "convert"
+IMAGEMAGICK_CONVERT = "convert2"
 
 IMAGE_RESOLUTION = "800x600"
 THUMB_RESOLUTION = "150x150"

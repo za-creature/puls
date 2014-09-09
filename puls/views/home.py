@@ -13,7 +13,7 @@ def home():
     rates = Config.get("exchange", {})
     rates["RON"] = 1
     return {"rates": rates,
-            "targets": Target.objects.filter()}
+            "targets": Target.objects()}
 
 
 @app.route("/generate/")

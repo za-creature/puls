@@ -1,7 +1,16 @@
 {% extends "boilerplate.html" %}
 
+{% import "admin/macros.html" as macros %}
+
+{% block css %}
+    {{ super() }}
+    {{ stylesheet("upstream/select2") }}
+    {{ stylesheet("upstream/select2-bootstrap") }}
+{% endblock %}
+
 {% block js %}
     {{ super() }}
+    {{ javascript("upstream/select2") }}
     {{ javascript("ui") }}
 {% endblock %}
 

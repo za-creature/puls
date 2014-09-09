@@ -1,17 +1,33 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Target, TargetForm
-from puls import app
+from puls.models import Target, Targets, TargetForm
+from puls.compat import unquote_plus, str
+from puls import app, paginate
 
-import urllib
 import flask
 
 
-@app.route("/admin/targets/")
+@app.route("/admin/targets/", endpoint="manage_targets")
+@app.route("/admin/targets/<int:page>/")
 @app.template("admin/targets/list.html")
 @app.logged_in
-def manage_targets():
-    return {"items": Target.objects.filter()}
+def list_targets(page=1):
+    return {"page": paginate(Target.objects, page, 20)}
+
+
+@app.route("/admin/targets/search/")
+@app.logged_in
+def search_targets():
+    query = flask.request.args.get("term", "")
+    return flask.jsonify({"results": [{
+        "id": str(item["_id"]),
+        "text": str(item["name"])
+    }
+        for item in Targets.find({"$text": {"$search": query}},
+                                 {"score": {"$meta": "textScore"}})
+                           .sort([("score", {"$meta": "textScore"})])
+                           .limit(100)
+    ]})
 
 
 @app.route("/admin/targets/new", methods=["GET", "POST"],
@@ -23,10 +39,7 @@ def edit_target(id=None):
     if id is None:
         item = None
     else:
-        try:
-            item = Target.objects.get(id=urllib.unquote_plus(id))
-        except Target.DoesNotExist:
-            return flask.abort(404)
+        item = Target.objects.get_or_404(id=unquote_plus(id))
 
     form = TargetForm(obj=item)
 
@@ -45,11 +58,8 @@ def edit_target(id=None):
 @app.route("/admin/targets/<id>/delete/")
 @app.logged_in
 def delete_target(id):
-    try:
-        item = Target.objects.get(id=urllib.unquote_plus(id))
+    item = Target.objects.get_or_404(id=unquote_plus(id))
+    item.delete()
 
-        item.delete()
-        flask.flash("Your target has been deleted!", "warning")
-        return flask.redirect(flask.url_for("manage_targets"))
-    except Target.DoesNotExist:
-        return flask.abort(404)
+    flask.flash("Your target has been deleted!", "warning")
+    return flask.redirect(flask.url_for("manage_targets"))

@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.globals import *  # noqa
 
-import flask.ext.mongoengine
+import flask_mongoengine
 import flask_wtf
 import logging
 import celery
@@ -48,7 +48,7 @@ app.task = celery.task
 
 # connect to databases
 app.redis = redis.StrictRedis(**app.config["REDIS_SETTINGS"])
-app.db = flask.ext.mongoengine.MongoEngine(app)
+app.db = flask_mongoengine.MongoEngine(app)
 
 
 # import decorators into the application
@@ -65,6 +65,7 @@ for name in dir(puls.helpers):
     item = getattr(puls.helpers, name)
     if callable(item):
         app.jinja_env.globals[name] = item
+        app.jinja_env.filters[name] = item
 
 
 # prepare session handler

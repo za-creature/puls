@@ -1,17 +1,33 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Class, ClassForm
-from puls import app
+from puls.models import Class, Classes, ClassForm
+from puls.compat import unquote_plus
+from puls import app, paginate
 
-import urllib
 import flask
 
 
-@app.route("/admin/classes/")
+@app.route("/admin/classes/", endpoint="manage_classes")
+@app.route("/admin/classes/<int:page>/")
 @app.template("admin/classes/list.html")
 @app.logged_in
-def manage_classes():
-    return {"items": Class.objects.filter()}
+def list_classes(page=1):
+    return {"page": paginate(Class.objects, page, 20)}
+
+
+@app.route("/admin/classes/search/")
+@app.logged_in
+def search_classes():
+    query = flask.request.args.get("term", "")
+    return flask.jsonify({"results": [{
+        "id": str(item["_id"]),
+        "text": str(item["name"])
+    }
+        for item in Classes.find({"$text": {"$search": query}},
+                                 {"score": {"$meta": "textScore"}})
+                           .sort([("score", {"$meta": "textScore"})])
+                           .limit(100)
+    ]})
 
 
 @app.route("/admin/classes/new", methods=["GET", "POST"],
@@ -23,10 +39,7 @@ def edit_class(id=None):
     if id is None:
         item = None
     else:
-        try:
-            item = Class.objects.get(id=urllib.unquote_plus(id))
-        except Class.DoesNotExist:
-            return flask.abort(404)
+        item = Class.objects.get_or_404(id=unquote_plus(id))
 
     form = ClassForm(obj=item)
 
@@ -45,11 +58,8 @@ def edit_class(id=None):
 @app.route("/admin/classes/<id>/delete/")
 @app.logged_in
 def delete_class(id):
-    try:
-        item = Class.objects.get(id=urllib.unquote_plus(id))
+    item = Class.objects.get_or_404(id=unquote_plus(id))
+    item.delete()
 
-        item.delete()
-        flask.flash("Your class has been deleted!", "warning")
-        return flask.redirect(flask.url_for("manage_classes"))
-    except Class.DoesNotExist:
-        return flask.abort(404)
+    flask.flash("Your class has been deleted!", "warning")
+    return flask.redirect(flask.url_for("manage_classes"))
