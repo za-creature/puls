@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models.targets import Target, TargetField
+from puls.models.targets import TargetWeightSpec, TargetWeightField
 from puls.models.photos import Photo, PhotoField
 from puls.models import (auto_modified, Searchable, ReferenceField,
                          MultiReferenceField)
@@ -12,36 +12,13 @@ import datetime
 import wtforms as wtf
 
 
-class MetadatumWeightSpec(app.db.EmbeddedDocument):
-    target = mge.ReferenceField(Target, required=True)
-    weight = mge.FloatField(required=True)
-
-
-class MetadatumWeightSpecForm(app.db.EmbeddedDocument):
-    target = TargetField("Target", [wtf.validators.InputRequired()])
-    weight = wtf.FloatField("Weight", [wtf.validators.InputRequired()])
-
-
 class Metadatum(app.db.EmbeddedDocument):
     name = mge.StringField(required=True, max_length=64)
     unit = mge.StringField(required=True, max_length=16)
 
     factor = mge.FloatField(default=1)
     exponent = mge.FloatField(default=1)
-    weights = mge.ListField(mge.EmbeddedDocumentField(MetadatumWeightSpec))
-
-
-class MetadatumForm(flask_wtf.Form):
-    name = wtf.StringField("Name", [wtf.validators.InputRequired(),
-                                    wtf.validators.Length(max=64)])
-    unit = wtf.StringField("Unit", [wtf.validators.InputRequired(),
-                                    wtf.validators.Length(max=16)])
-    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
-    exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
-
-    weights = wtf.FieldList(wtf.FormField(MetadatumWeightSpecForm),
-                            default=[MetadatumWeightSpec(target=item, weight=0)
-                                     for item in Target.objects])
+    weights = mge.ListField(mge.EmbeddedDocumentField(TargetWeightSpec))
 
 
 @auto_modified
@@ -67,6 +44,17 @@ class ClassField(ReferenceField):
 
 class MultiClassField(MultiReferenceField):
     reference_class = Class
+
+
+class MetadatumForm(flask_wtf.Form):
+    name = wtf.StringField("Name", [wtf.validators.InputRequired(),
+                                    wtf.validators.Length(max=64)])
+    unit = wtf.StringField("Unit", [wtf.validators.InputRequired(),
+                                    wtf.validators.Length(max=16)])
+    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
+    exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
+
+    weights = TargetWeightField()
 
 
 class ClassForm(flask_wtf.Form):

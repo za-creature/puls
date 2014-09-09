@@ -12,6 +12,7 @@ from __future__ import absolute_import, unicode_literals, division
 
 
 # fix import path
+import flask_failsafe
 import sys
 import os
 os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -19,5 +20,9 @@ sys.path.append(os.getcwd())
 
 
 # load module and run it in debug mode
-import puls
-puls.app.run(host="0.0.0.0", port=80, debug=True, threaded=True)
+@flask_failsafe.failsafe
+def create_app():
+    from puls import app
+    return app
+
+create_app().run(host="0.0.0.0", port=80, debug=True, threaded=True)
