@@ -1,33 +1,39 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Manufacturer, Manufacturers, ManufacturerForm
+from puls.models import Manufacturer, ManufacturerForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
 import flask
 
 
-@app.route("/admin/manufacturers/", endpoint="manage_manufacturers")
+@app.route("/admin/manufacturers/", methods=["GET", "POST"],
+           endpoint="manage_manufacturers")
 @app.route("/admin/manufacturers/<int:page>/")
 @app.template("admin/manufacturers/list.html")
 @app.logged_in
 def list_manufacturers(page=1):
-    return {"page": paginate(Manufacturer.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Manufacturer.search(term)
+    else:
+        page = paginate(Manufacturer.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/manufacturers/search/")
 @app.logged_in
 def search_manufacturers():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Manufacturers.find({"$text": {"$search": query}},
-                                       {"score": {"$meta": "textScore"}})
-                                 .sort([("score", {"$meta": "textScore"})])
-                                 .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Manufacturer.search(term)
+    else:
+        results = Manufacturer.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/manufacturers/new", methods=["GET", "POST"],

@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Benchmark, Benchmarks, BenchmarkForm
+from puls.models import Benchmark, BenchmarkForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
@@ -12,22 +12,27 @@ import flask
 @app.template("admin/benchmarks/list.html")
 @app.logged_in
 def list_benchmarks(page=1):
-    return {"page": paginate(Benchmark.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Benchmark.search(term)
+    else:
+        page = paginate(Benchmark.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/benchmarks/search/")
 @app.logged_in
 def search_benchmarks():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Benchmarks.find({"$text": {"$search": query}},
-                                    {"score": {"$meta": "textScore"}})
-                              .sort([("score", {"$meta": "textScore"})])
-                              .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Benchmark.search(term)
+    else:
+        results = Benchmark.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/benchmarks/new", methods=["GET", "POST"],

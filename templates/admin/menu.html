@@ -12,7 +12,7 @@
             </button>
             <a class="navbar-brand" href="{{ url_for("dashboard") }}">
                 <i class="glyphicon-pro glyphicon-pro-cardio"></i>&nbsp;
-                Puls</a>
+                <span class="hidden-sm">Puls</span></a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -22,43 +22,43 @@
                 >
                     <a href="{{ url_for("manage_components") }}">
                     <i class="glyphicon-pro glyphicon-pro-cogwheels"></i>&nbsp;
-                    Components
+                    <span class="hidden-sm">Components</span>
                 </a></li>
                 <li{% if active_page == "benchmarks" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_benchmarks") }}">
                     <i class="glyphicon-pro glyphicon-pro-charts"></i>&nbsp;
-                    Benchmarks
+                    <span class="hidden-sm">Benchmarks</span>
                 </a></li>
                 <li{% if active_page == "classes" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_classes") }}">
                     <i class="glyphicon-pro glyphicon-pro-folder-open"></i>&nbsp;
-                    Classes
+                    <span class="hidden-sm">Classes</span>
                 </a></li>
                 <li{% if active_page == "connectors" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_connectors") }}">
                     <i class="glyphicon-pro glyphicon-pro-link"></i>&nbsp;
-                    Connectors
+                    <span class="hidden-sm">Connectors</span>
                 </a></li>
                 <li{% if active_page == "targets" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_targets") }}">
                     <i class="glyphicon-pro glyphicon-pro-screenshot"></i>&nbsp;
-                    Targets
+                    <span class="hidden-sm">Targets</span>
                 </a></li>
                 <li{% if active_page == "manufacturers" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_manufacturers") }}">
                     <i class="glyphicon-pro glyphicon-pro-blacksmith"></i>&nbsp;
-                    Manufacturers
+                    <span class="hidden-sm">Manufacturers</span>
                 </a></li>
                 <li{% if active_page == "suppliers" %} class="active"{% endif %}
                 >
                     <a href="{{ url_for("manage_suppliers") }}">
                     <i class="glyphicon-pro glyphicon-pro-shopping-cart"></i>&nbsp;
-                    Suppliers
+                    <span class="hidden-sm">Suppliers</span>
                 </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">

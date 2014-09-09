@@ -42,6 +42,20 @@ class memoized(object):
         return functools.partial(self.__call__, obj)
 
 
+class Searchable(object):
+    class NonIterableList(list):
+        total = 0
+
+    @classmethod
+    def search(self, query, limit=100):
+        col = self._get_collection()
+        result = col.find({"$text": {"$search": query}},
+                          {"score": {"$meta": "textScore"}}) \
+                    .sort([("score", {"$meta": "textScore"})]) \
+                    .limit(limit)
+        return self.NonIterableList([self._from_son(item) for item in result])
+
+
 def auto_modified(cls):
     def callback(sender, document):
         document.modified = datetime.now()

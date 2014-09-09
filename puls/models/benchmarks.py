@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.components import Component, ComponentField
 from puls.models.classes import Class
-from puls.models import auto_modified
+from puls.models import auto_modified, Searchable
 from puls import app
 
 import mongoengine as mge
@@ -17,7 +17,7 @@ class BenchmarkEntry(app.db.EmbeddedDocument):
 
 
 @auto_modified
-class Benchmark(app.db.Document):
+class Benchmark(app.db.Document, Searchable):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -36,9 +36,6 @@ class Benchmark(app.db.Document):
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
-
-
-Benchmarks = Benchmark._get_collection()
 
 
 class BenchmarkEntryForm(flask_wtf.Form):

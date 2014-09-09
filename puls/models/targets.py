@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import auto_modified
+from puls.models import auto_modified, Searchable
 from puls import app
 
 import mongoengine as mge
@@ -10,7 +10,7 @@ import wtforms as wtf
 
 
 @auto_modified
-class Target(app.db.Document):
+class Target(app.db.Document, Searchable):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -22,9 +22,6 @@ class Target(app.db.Document):
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
-
-
-Targets = Target._get_collection()
 
 
 class TargetForm(flask_wtf.Form):

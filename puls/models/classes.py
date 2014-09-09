@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified
+from puls.models import auto_modified, Searchable
 from puls.compat import str
 from puls import app
 
@@ -20,7 +20,7 @@ class Metadatum(app.db.EmbeddedDocument):
 
 
 @auto_modified
-class Class(app.db.Document):  # this is so meta
+class Class(app.db.Document, Searchable):  # this is so meta
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -34,9 +34,6 @@ class Class(app.db.Document):  # this is so meta
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
-
-
-Classes = Class._get_collection()
 
 
 class ClassField(wtf.HiddenField):

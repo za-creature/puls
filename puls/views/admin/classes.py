@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Class, Classes, ClassForm
+from puls.models import Class, ClassForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
@@ -12,22 +12,27 @@ import flask
 @app.template("admin/classes/list.html")
 @app.logged_in
 def list_classes(page=1):
-    return {"page": paginate(Class.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Class.search(term)
+    else:
+        page = paginate(Class.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/classes/search/")
 @app.logged_in
 def search_classes():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Classes.find({"$text": {"$search": query}},
-                                 {"score": {"$meta": "textScore"}})
-                           .sort([("score", {"$meta": "textScore"})])
-                           .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Class.search(term)
+    else:
+        results = Class.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/classes/new", methods=["GET", "POST"],

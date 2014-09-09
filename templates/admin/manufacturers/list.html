@@ -10,52 +10,75 @@
 {% endblock %}
 
 {% block contents %}
-    <a class="btn btn-primary"
-       href="{{ url_for("add_manufacturer") }}">
-        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
-        New manufacturer
-    </a>
+    <div class="row">
+        <div class="col-sm-5 col-md-4 col-lg-3">
+            <a class="btn btn-primary btn-block"
+               href="{{ url_for("add_manufacturer") }}">
+                <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+                New manufacturer
+            </a>
+        </div>
+        <div class="col-sm-7 col-md-8 col-lg-6 col-lg-offset-3">
+            <form action="{{ url_for("manage_manufacturers") }}"
+                  method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="input-group">
+                    <input type="search"
+                           class="form-control"
+                           name="term"
+                           value="{{ term }}"
+                           placeholder="Search manufacturers">
+                    <span class="input-group-btn">
+                        <button type="submit"
+                                class="btn btn-warning">Go!</button>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
     <hr/>
-    <table class="table table-hover table-actions">
-        <tr>
-            <th>Name</th>
-            <th>Website</th>
-            <th>Created on</th>
-            <th>Last modified</th>
-            <th class="actions">Actions</th>
-        </tr>
-        {% for item in page %}
+    <div class="table-responsive">
+        <table class="table table-hover table-actions">
             <tr>
-                <td>{{ item.name }}</td>
-                <td><a href="{{ item.url }}"
-                       target="_blank">{{ item.url }}</a></td>
-                <td>{{ item.created|dateformat }}</td>
-                <td>{{ item.modified|dateformat }}</td>
-                <td class="actions">
-                    <div class="btn-group btn-group-sm">
-                        <a class="btn btn-success"
-                           href="{{ url_for("edit_manufacturer", id=item.id) }}">
-                            <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
-                            Edit
-                        </a>
-                        <a class="btn btn-danger confirm"
-                           href="{{ url_for("delete_manufacturer", id=item.id) }}"
-                           data-title="Confirm delete"
-                           data-content="Are you sure you wish to delete this manufacturer? This action can not be undone!"
-                        >
-                            <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
-                            Delete
-                        </a>
-                    </div>
-                </td>
+                <th>Name</th>
+                <th>Website</th>
+                <th>Created on</th>
+                <th>Last modified</th>
+                <th class="actions">Actions</th>
             </tr>
-        {% else %}
-            <tr class="warning">
-                <td colspan="5">
-                    No manufacturers have been defined.
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+            {% for item in page %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td><a href="{{ item.url }}"
+                           target="_blank">{{ item.url }}</a></td>
+                    <td>{{ item.created|dateformat }}</td>
+                    <td>{{ item.modified|dateformat }}</td>
+                    <td class="actions">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-success"
+                               href="{{ url_for("edit_manufacturer", id=item.id) }}">
+                                <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
+                                Edit
+                            </a>
+                            <a class="btn btn-danger confirm"
+                               href="{{ url_for("delete_manufacturer", id=item.id) }}"
+                               data-title="Confirm delete"
+                               data-content="Are you sure you wish to delete this manufacturer? This action can not be undone!"
+                            >
+                                <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
+                                Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class="warning">
+                    <td colspan="5">
+                        No manufacturers have been defined.
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
     {{ macros.pagination(page) }}
 {% endblock %}

@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified
+from puls.models import auto_modified, Searchable
 from puls.compat import str
 from puls import app
 
@@ -13,7 +13,7 @@ import wtforms as wtf
 
 
 @auto_modified
-class Supplier(app.db.Document):
+class Supplier(app.db.Document, Searchable):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -26,9 +26,6 @@ class Supplier(app.db.Document):
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
-
-
-Suppliers = Supplier._get_collection()
 
 
 class SupplierField(wtf.TextField):

@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Supplier, Suppliers, SupplierForm
+from puls.models import Supplier, SupplierForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
@@ -12,22 +12,27 @@ import flask
 @app.template("admin/suppliers/list.html")
 @app.logged_in
 def list_suppliers(page=1):
-    return {"page": paginate(Supplier.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Supplier.search(term)
+    else:
+        page = paginate(Supplier.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/manufacturers/search/")
 @app.logged_in
 def search_suppliers():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Suppliers.find({"$text": {"$search": query}},
-                                   {"score": {"$meta": "textScore"}})
-                             .sort([("score", {"$meta": "textScore"})])
-                             .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Supplier.search(term)
+    else:
+        results = Supplier.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/suppliers/new", methods=["GET", "POST"],

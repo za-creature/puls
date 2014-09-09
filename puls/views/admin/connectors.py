@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Connector, Connectors, ConnectorForm
+from puls.models import Connector, ConnectorForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
@@ -12,22 +12,27 @@ import flask
 @app.template("admin/connectors/list.html")
 @app.logged_in
 def list_connectors(page=1):
-    return {"page": paginate(Connector.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Connector.search(term)
+    else:
+        page = paginate(Connector.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/connectors/search/")
 @app.logged_in
 def search_connectors():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Connectors.find({"$text": {"$search": query}},
-                                    {"score": {"$meta": "textScore"}})
-                              .sort([("score", {"$meta": "textScore"})])
-                              .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Connector.search(term)
+    else:
+        results = Connector.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/connectors/new", methods=["GET", "POST"],

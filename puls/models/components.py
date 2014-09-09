@@ -5,7 +5,7 @@ from puls.models.connectors import ConnectorSpec, ConnectorSpecForm
 from puls.models.suppliers import Supplier, SupplierField
 from puls.models.classes import Class, ClassField
 from puls.models.photos import Photo, PhotoField
-from puls.models import auto_modified
+from puls.models import auto_modified, Searchable
 from puls.compat import str
 from puls import app
 
@@ -39,7 +39,7 @@ class ExternalComponent(app.db.Document):
 
 
 @auto_modified
-class Component(app.db.Document):
+class Component(app.db.Document, Searchable):
     name = mge.StringField(required=True, max_length=256)
     description = mge.StringField(default="", max_length=4096)
     photo = mge.ReferenceField(Photo, reverse_delete_rule=mge.NULLIFY)
@@ -56,9 +56,6 @@ class Component(app.db.Document):
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
     modified = mge.DateTimeField(default=datetime.datetime.now)
-
-
-Components = Component._get_collection()
 
 
 class ComponentField(wtf.TextField):

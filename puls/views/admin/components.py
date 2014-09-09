@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Component, Components, ComponentForm
+from puls.models import Component, ComponentForm
 from puls.compat import unquote_plus
 from puls import app, paginate
 
@@ -12,22 +12,27 @@ import flask
 @app.template("admin/components/list.html")
 @app.logged_in
 def list_components(page=1):
-    return {"page": paginate(Component.objects, page, 20)}
+    term = flask.request.form.get("term", "")
+    if term:
+        page = Component.search(term)
+    else:
+        page = paginate(Component.objects, page, 20)
+    return {"term": term,
+            "page": page}
 
 
 @app.route("/admin/components/search/")
 @app.logged_in
 def search_components():
-    query = flask.request.args.get("term", "")
-    return flask.jsonify({"results": [{
-        "id": str(item["_id"]),
-        "text": str(item["name"])
-    }
-        for item in Components.find({"$text": {"$search": query}},
-                                    {"score": {"$meta": "textScore"}})
-                              .sort([("score", {"$meta": "textScore"})])
-                              .limit(100)
-    ]})
+    term = flask.request.args.get("term", "")
+    if term:
+        results = Component.search(term)
+    else:
+        results = Component.objects.limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
 
 
 @app.route("/admin/components/new", methods=["GET", "POST"],

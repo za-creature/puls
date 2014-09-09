@@ -10,11 +10,32 @@
 {% endblock %}
 
 {% block contents %}
-    <a class="btn btn-primary"
-       href="{{ url_for("add_class") }}">
-        <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
-        New class
-    </a>
+    <div class="row">
+        <div class="col-sm-5 col-md-4 col-lg-3">
+            <a class="btn btn-primary btn-block"
+               href="{{ url_for("add_class") }}">
+                <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+                New class
+            </a>
+        </div>
+        <div class="col-sm-7 col-md-8 col-lg-6 col-lg-offset-3">
+            <form action="{{ url_for("manage_classes") }}"
+                  method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="input-group">
+                    <input type="search"
+                           class="form-control"
+                           name="term"
+                           value="{{ term }}"
+                           placeholder="Search classes">
+                    <span class="input-group-btn">
+                        <button type="submit"
+                                class="btn btn-warning">Go!</button>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
     <hr/>
     <table class="table table-hover table-actions">
         <tr>
