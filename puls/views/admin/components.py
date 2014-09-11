@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Component, ComponentForm, ComponentMetadataSpec
+from puls.models import (Component, ComponentForm, ComponentMetadataSpec,
+                         Connector, Bus, Supplier, ExternalComponent)
 from puls.compat import unquote_plus, str
 from puls import app, paginate
 
@@ -39,6 +40,21 @@ def search_components():
                                       for item in results]})
 
 
+@app.route("/admin/components/search/external/<id>")
+@app.logged_in
+def search_external_components(id):
+    supplier = Supplier.objects.get_or_404(id=unquote_plus(id))
+    term = flask.request.args.get("term", "")
+    if term:
+        results = ExternalComponent.search(term, supplier.id)
+    else:
+        results = ExternalComponent.objects(supplier=supplier.id).limit(100)
+
+    return flask.jsonify({"results": [{"id": str(item.id),
+                                       "text": str(item.name)}
+                                      for item in results]})
+
+
 @app.route("/admin/components/new/", methods=["GET", "POST"],
            endpoint="add_component")
 @app.route("/admin/components/<id>/edit/", methods=["GET", "POST"])
@@ -52,10 +68,43 @@ def edit_component(id=None):
 
     form = ComponentForm(obj=item)
 
+    external_references = []
+    matched_suppliers = set()
+    if item:
+        for external in item.external:
+            matched_suppliers.add(external.supplier)
+            external_references.append({"supplier": external.supplier,
+                                        "component": external})
+    for supplier in Supplier.objects:
+        if supplier not in matched_suppliers:
+            external_references.append({"supplier": supplier,
+                                        "component": None})
+
     if form.validate_on_submit():
         if not item:
             item = Component()
         form.populate_obj(item)
+
+        # add connectors
+        item.connectors = []
+        counts = flask.request.form.getlist("counts")
+        for key, value in enumerate(flask.request.form.getlist("buses")):
+            bus = Bus.objects.get_or_404(id=value)
+            try:
+                count = int(counts[key])
+                if count < -10 or count > 10:
+                    raise ValueError
+            except ValueError, IndexError:
+                flask.abort(404)
+            item.connectors.append(Connector(bus=bus, count=count))
+
+        # add external components
+        item.external = []
+        for id in flask.request.form.getlist("external"):
+            if id:
+                external = ExternalComponent.objects.get_or_404(id=id)
+                item.external.append(external)
+
         item.save()
         flask.flash("The component was saved. Please update the metadata "
                     "if new classes were added", "success")
@@ -63,7 +112,8 @@ def edit_component(id=None):
                                             id=str(item.id)))
 
     return {"form": form,
-            "item": item}
+            "item": item,
+            "external": external_references}
 
 
 @app.route("/admin/components/<id>/metadata/", methods=["GET", "POST"])
@@ -93,7 +143,7 @@ def edit_component_meta(id=None):
     for entry in item.metadata:
         for name, value in entry.values.items():
             default[field_id(entry.cls, name)] = value
-    default = type("DefaultMetadata", (object, ), default)()
+    default = type(b"DefaultMetadata", (object, ), default)()
 
     form = MetaForm(obj=default)
 

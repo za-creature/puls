@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+
+{% set active_page = "benchmarks" %}
+
+{% block heading %}
+    <ol class="breadcrumb">
+        <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
+        <li><a href="{{ url_for("manage_benchmarks") }}">Benchmarks</a></li>
+        <li><a href="{{ url_for("edit_class", id=bench.id) }}">{{ bench.name }}</a></li>
+        <li class="active">Entries</li>
+    </ol>
+    <ul class="nav nav-tabs" role="tablist">
+        <li><a href="{{ url_for("edit_benchmark", id=bench.id) }}">
+            General
+        </a></li>
+        <li class="active"><a>
+            Entries
+        </a></li>
+        <li><a href="{{ url_for("add_benchmark_entry", id=bench.id) }}">
+            <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
+            New entry
+        </a></li>
+    </ul>
+    <br/>
+{% endblock %}
+
+{% block contents %}
+    <table class="table table-hover table-actions">
+        <tr>
+            <th>Name</th>
+            <th>Score</th>
+            <th class="actions">Actions</th>
+        </tr>
+        {% for entry in bench.entries %}
+            <tr>
+                <td>{{ entry.component.name }}</td>
+                <td>{{ entry.score }}</a></td>
+                <td class="actions">
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-success"
+                           href="{{ url_for("edit_benchmark_entry",
+                                            id=bench.id,
+                                            component=entry.component.id) }}">
+                            <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
+                            Edit
+                        </a>
+                        <a class="btn btn-danger confirm"
+                           href="{{ url_for("delete_benchmark_entry",
+                                            id=bench.id,
+                                            component=entry.component.id) }}"
+                           data-title="Confirm delete"
+                           data-content="Are you sure you wish to delete this benchmark entry? This action can not be undone!"
+                        >
+                            <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
+                            Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr class="warning">
+                <td colspan="3">
+                    No entries have been added to this benchmark.
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

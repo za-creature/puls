@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Config, Target
+from puls.models import Config, Target, Supplier
+from puls.tasks import update_supplier
 from puls import app
 
 import flask
@@ -28,3 +29,10 @@ def generate():
 @app.has_main_menu
 def about():
     pass
+
+
+@app.route("/runtask")
+def runtask():
+    supplier = Supplier.objects.get_or_404(name="EMag")
+    update_supplier.delay(supplier)
+    return "OK"

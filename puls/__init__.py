@@ -40,7 +40,7 @@ class PulsTask(celery.Task):
 
     def __call__(self, *args, **kwargs):
         with app.app_context():
-            return celery.Task.__call__(self, *args, **kwargs)
+            return super(PulsTask, self).__call__(*args, **kwargs)
 
 celery.Task = PulsTask
 app.task = celery.task

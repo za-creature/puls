@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.components import Component, ComponentField
-from puls.models.classes import Class
+from puls.models.classes import Class, ClassField
 from puls.models import auto_modified, Searchable
 from puls import app
 
@@ -39,8 +39,8 @@ class Benchmark(app.db.Document, Searchable):
 
 
 class BenchmarkEntryForm(flask_wtf.Form):
-    component = ComponentField("Component", [wtf.validators.Required()])
-    score = wtf.FloatField("Score", [wtf.validators.Required()])
+    component = ComponentField("Component", [wtf.validators.InputRequired()])
+    score = wtf.FloatField("Score", [wtf.validators.InputRequired()])
 
 
 class BenchmarkForm(flask_wtf.Form):
@@ -49,6 +49,11 @@ class BenchmarkForm(flask_wtf.Form):
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
 
-    factor = wtf.FloatField("Factor", [wtf.validators.Required()])
-    exponent = wtf.FloatField("Exponent", [wtf.validators.Required()])
-    entries = wtf.FieldList(wtf.FormField(BenchmarkEntryForm), min_entries=1)
+    url = wtf.TextField("URL", [wtf.validators.InputRequired(),
+                                wtf.validators.Length(max=256)])
+    cls = ClassField("Component Class", [wtf.validators.InputRequired()])
+
+
+    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
+    exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
+

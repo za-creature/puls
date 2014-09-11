@@ -15,6 +15,7 @@ CELERY_MONGODB_BACKEND_SETTINGS = {"database": MONGODB_SETTINGS["db"],
                                    "max_pool_size": 10}
 CELERY_ACCEPT_CONTENT = ["pickle"]
 CELERYD_CONCURRENCY = 2
+CELERYD_HIJACK_ROOT_LOGGER = False
 
 # monkeypatch task settings here
 CELERY_ANNOTATIONS = {

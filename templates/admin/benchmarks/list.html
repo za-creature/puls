@@ -7,9 +7,6 @@
         <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
         <li class="active">Benchmarks</li>
     </ol>
-{% endblock %}
-
-{% block contents %}
     <div class="row">
         <div class="col-sm-5 col-md-4 col-lg-3">
             <a class="btn btn-primary btn-block"
@@ -36,7 +33,10 @@
             </form>
         </div>
     </div>
-    <hr/>
+    <br/>
+{% endblock %}
+
+{% block contents %}
     <table class="table table-hover table-actions">
         <tr>
             <th>Name</th>

@@ -8,8 +8,7 @@
         <li><a href="{{ url_for("manage_targets") }}">Targets</a></li>
         {% if item %}
             {% set action = url_for("edit_target", id=item.id) %}
-            <li><a href="{{ action }}">{{ item.name }}</a></li>
-            <li class="active">Edit</li>
+            <li class="active">{{ item.name }}</li>
         {% else %}
             {% set action = url_for("add_target") %}
             <li class="active">New</li>

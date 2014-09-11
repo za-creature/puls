@@ -18,6 +18,8 @@
     {% set active_page = active_page %}
     {% include "admin/menu.html" %}
     <div class="container menu-offset">
+        {% include "flash.html" %}
+
         {% block heading %}
             <div class="row">
                 <div class="col-xs-12">
@@ -25,8 +27,6 @@
                 </div>
             </div>
         {% endblock %}
-
-        {% include "flash.html" %}
 
         {% block contents %}
         {% endblock %}

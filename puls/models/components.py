@@ -49,10 +49,6 @@ class ExternalComponent(app.db.Document, Searchable):
         return self.NonIterableList([self._from_son(item) for item in result])
 
 
-class ExternalComponentField(ReferenceField):
-    reference_class = ExternalComponent
-
-
 class ComponentMetadataSpec(app.db.EmbeddedDocument):
     cls = mge.ReferenceField(Class)
     values = mge.DictField(mge.FloatField)
@@ -100,5 +96,3 @@ class ComponentForm(flask_wtf.Form):
     classes = MultiClassField("Classes", [wtf.validators.InputRequired()])
     manufacturers = MultiManufacturerField("Manufacturers",
                                            [wtf.validators.InputRequired()])
-    # connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm))
-    # external = wtf.FieldList(ExternalComponentField())

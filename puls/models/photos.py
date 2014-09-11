@@ -130,6 +130,7 @@ class PhotoField(flask_wtf.file.FileField):
 
         # save the original file
         try:
+            logging.info(photo.orig_path)
             input.save(photo.orig_path)
         except Exception:
             raise wtf.ValidationError("Unable to save image.")
@@ -192,7 +193,6 @@ class PhotoField(flask_wtf.file.FileField):
             photo.save()
             return photo
         except Exception:
-            logging.exception("FUT")
             # delete temp file(s)
             photo.delete_files()
             raise wtf.ValidationError("Invalid or corrupt image.")

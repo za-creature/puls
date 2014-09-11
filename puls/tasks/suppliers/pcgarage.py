@@ -13,8 +13,10 @@ except ImportError:
 
 
 class PCGarage(Supplier):
-    def init(self, *args, **kwargs):
-        super(PCGarage, self).init()
+    abstract = False
+
+    def __init__(self):
+        super(PCGarage, self).__init__()
 
         for args in (
             ["http://www.pcgarage.ro/", False],

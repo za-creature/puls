@@ -116,23 +116,21 @@ jQuery(function($)
     }
 
     // register templates (global)
-    $(".template").each(function() {
+    $(".template[data-cloned-by]").each(function() {
         var $template = $(this),
             $position = $template.next();
-        
+
         $($template.attr("data-cloned-by")).on("click", function(e) {
-            var $clone = $template.clone().insertBefore($position);
-
-            $(".btn-delete", $clone).on("click", function(e) {
-                $clone.remove();
-                e.preventDefault();
-            })
-
-            registerAll($clone);
+            registerAll($template.clone().insertBefore($position));
             e.preventDefault();
         });
         $template.remove();
     });
+
+    $("body").on("click", ".btn-delete", function(e) {
+        $(this).parents(".template").remove();
+        e.preventDefault();
+    })
 
     registerAll($("body"));
 });

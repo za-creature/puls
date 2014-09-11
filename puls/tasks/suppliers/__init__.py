@@ -12,29 +12,21 @@ import random
 import time
 
 
-class Supplier(PulsTask):
-    abstract = True
-
-    def __init__(self, *args, **kwargs):
-        PulsTask.__init__(self, *args, **kwargs)
-
-    def init(self):
-        """Called to initialize the crawler. Unable to use __init__ because
-        celery caches it."""
+class Supplier(object):
+    def __init__(self):
+        """Called to initialize the crawler."""
         self.http = requests.Session()
         self.http.max_redirects = app.config["CRAWLER_SETTINGS"]["redirects"]
-        print(random.sample(
-            app.config["CRAWLER_SETTINGS"]["user_agents"], 1))
 
-        # self.http.headers["user-agent"], = 
+        self.http.headers["user-agent"], = random.sample(
+            app.config["CRAWLER_SETTINGS"]["user_agents"], 1)
         self.delay = app.config["CRAWLER_SETTINGS"]["delay"]
 
         self.queue = collections.deque()
         self.referrer = None
 
-    def run(self):
-        self.init()
-
+    def run(self, supplier):
+        self.supplier = supplier
         while self.queue:
             # get the most outstanding request from the queue and execute it,
             # making sure to update the referrer header for the next request
@@ -42,6 +34,7 @@ class Supplier(PulsTask):
             tries = app.config["CRAWLER_SETTINGS"]["tries"]
             while tries:
                 try:
+                    logging.debug("GET {0}".format(url))
                     r = requests.get(
                         url,
                         headers={"referer": self.referrer},
@@ -89,7 +82,8 @@ class Supplier(PulsTask):
             self.queue.append((url, data))
 
     def found(self, _id, name, price, stock, url):
-        ExternalComponent.objects(supplier=self.spec.id,
+        logging.debug("Found component {0}".format(name))
+        ExternalComponent.objects(supplier=self.supplier,
                                   identifier=_id) \
                          .update_one(upsert=True,
                                      set__name=name[:256],

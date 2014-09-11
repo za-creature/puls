@@ -11,8 +11,10 @@ except ImportError:
 
 
 class EMag(Supplier):
-    def init(self):
-        super(EMag, self).init()
+    abstract = False
+
+    def __init__(self):
+        super(EMag, self).__init__()
 
         for args in (
             ("http://www.emag.ro", False),  # load homepage

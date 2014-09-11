@@ -64,6 +64,11 @@ class ReferenceField(wtf.HiddenField):
         if "class_" not in kwargs:
             kwargs["class_"] = ""
         kwargs["class_"] += " combobox"
+        if self.data:
+            kwargs["data-caption"] = self.data.name
+            kwargs["value"] = self.data.id
+        else:
+            kwargs["data-caption"] = kwargs["value"] = ""
         return super(ReferenceField, cls).widget(self, **kwargs)
 
     def process_data(self, value):
@@ -75,6 +80,7 @@ class ReferenceField(wtf.HiddenField):
 
     def process_formdata(self, valuelist):
         if valuelist:
+            print("TRYTHY")
             try:
                 id = str(valuelist[0])
                 self.data = self.reference_class.objects.get(id=id)
@@ -93,10 +99,12 @@ class MultiReferenceField(wtf.HiddenField):
             kwargs["class_"] = ""
         kwargs["class_"] += " combobox"
         kwargs["data-multiple"] = True
-        kwargs["data-caption"] = ",".join([str(item.name)
-                                           for item in self.data])
         if self.data:
+            kwargs["data-caption"] = ",".join([str(item.name)
+                                               for item in self.data])
             kwargs["value"] = ",".join([str(item.id) for item in self.data])
+        else:
+            kwargs["data-caption"] = kwargs["value"] = ""
         return super(MultiReferenceField, cls).widget(self, **kwargs)
 
     def process_data(self, valuelist):
