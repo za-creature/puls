@@ -1,9 +1,9 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.manufacturers import Manufacturer, MultiManufacturerField
-from puls.models.connectors import ConnectorSpec, ConnectorSpecForm
+from puls.models.buses import Connector
 from puls.models.suppliers import Supplier
-from puls.models.classes import Class, ClassField, MultiClassField
+from puls.models.classes import Class, MultiClassField
 from puls.models.photos import Photo, PhotoField
 from puls.models import (auto_modified, Searchable, ReferenceField,
                          MultiReferenceField)
@@ -58,10 +58,6 @@ class ComponentMetadataSpec(app.db.EmbeddedDocument):
     values = mge.DictField(mge.FloatField)
 
 
-class ComponentMetadataForm(flask_wtf.Form):
-    cls = ClassField("Class")
-
-
 @auto_modified
 class Component(app.db.Document, Searchable):
     meta = {"indexes": [
@@ -76,7 +72,7 @@ class Component(app.db.Document, Searchable):
                                                reverse_delete_rule=mge.PULL))
     manufacturers = mge.ListField(mge.ReferenceField(Manufacturer,
                                                      reverse_delete_rule=mge.PULL))  # noqa
-    connectors = mge.ListField(mge.EmbeddedDocumentField(ConnectorSpec))
+    connectors = mge.ListField(mge.EmbeddedDocumentField(Connector))
 
     external = mge.ListField(mge.ReferenceField(ExternalComponent))
     metadata = mge.ListField(mge.EmbeddedDocumentField(ComponentMetadataSpec))
@@ -95,14 +91,14 @@ class MultiComponentField(MultiReferenceField):
 
 
 class ComponentForm(flask_wtf.Form):
-    name = wtf.TextField("Name", [wtf.validators.Required(),
+    name = wtf.TextField("Name", [wtf.validators.InputRequired(),
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
     photo = PhotoField("Photo", [wtf.validators.InputRequired()])
 
-    classes = MultiClassField("Classes", [wtf.validators.Required])
+    classes = MultiClassField("Classes", [wtf.validators.InputRequired()])
     manufacturers = MultiManufacturerField("Manufacturers",
-                                           [wtf.validators.Required])
-    connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm))
-    external = wtf.FieldList(ExternalComponentField())
+                                           [wtf.validators.InputRequired()])
+    # connectors = wtf.FieldList(wtf.FormField(ConnectorSpecForm))
+    # external = wtf.FieldList(ExternalComponentField())

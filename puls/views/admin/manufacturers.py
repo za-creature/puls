@@ -36,9 +36,9 @@ def search_manufacturers():
                                       for item in results]})
 
 
-@app.route("/admin/manufacturers/new", methods=["GET", "POST"],
+@app.route("/admin/manufacturers/new/", methods=["GET", "POST"],
            endpoint="add_manufacturer")
-@app.route("/admin/manufacturers/<id>/edit", methods=["GET", "POST"])
+@app.route("/admin/manufacturers/<id>/edit/", methods=["GET", "POST"])
 @app.template("admin/manufacturers/form.html")
 @app.logged_in
 def edit_manufacturer(id=None):

@@ -7,7 +7,8 @@ from puls import app, paginate
 import flask
 
 
-@app.route("/admin/benchmarks/", endpoint="manage_benchmarks")
+@app.route("/admin/benchmarks/", methods=["GET", "POST"],
+           endpoint="manage_benchmarks")
 @app.route("/admin/benchmarks/<int:page>/")
 @app.template("admin/benchmarks/list.html")
 @app.logged_in
@@ -35,9 +36,9 @@ def search_benchmarks():
                                       for item in results]})
 
 
-@app.route("/admin/benchmarks/new", methods=["GET", "POST"],
+@app.route("/admin/benchmarks/new/", methods=["GET", "POST"],
            endpoint="add_benchmark")
-@app.route("/admin/benchmarks/<id>/edit", methods=["GET", "POST"])
+@app.route("/admin/benchmarks/<id>/edit/", methods=["GET", "POST"])
 @app.template("admin/benchmarks/form.html")
 @app.logged_in
 def edit_benchmark(id=None):

@@ -44,14 +44,25 @@ jQuery(function($)
         var $this = $(this);
         if($this.is("[data-url]"))
             $this.select2({
-                minimumInputLength: 1,
-                multiple: $this.prop("data-multiple"),
+                minimumInputLength: 0,
+                multiple: $this.is("[data-multiple]"),
+                initSelection: function($el, cb) {
+                    var multiple = $this.is("[data-multiple]"),
+                        keys = $el.attr("data-caption").split(","),
+                        values = $el.val().split(","),
+                        result = [];
+                    keys.forEach(function(_, id) {
+                        result.push({"text": keys[id],
+                                     "id": values[id]})
+                    });
+                    cb(result);
+                },
                 ajax: {
                     url: $this.attr("data-url"),
                     dataType: 'json',
                     type: "GET",
                     quietMillis: 200,
-                    data: function(term) { return {query: term}; },
+                    data: function(term) { return {term: term}; },
                     results: function(data) { return data; }
                 }
             });

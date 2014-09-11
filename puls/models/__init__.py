@@ -64,7 +64,7 @@ class ReferenceField(wtf.HiddenField):
         if "class_" not in kwargs:
             kwargs["class_"] = ""
         kwargs["class_"] += " combobox"
-        return super(ReferenceField, self).widget(kwargs)
+        return super(ReferenceField, cls).widget(self, **kwargs)
 
     def process_data(self, value):
         # process initialization data
@@ -93,17 +93,21 @@ class MultiReferenceField(wtf.HiddenField):
             kwargs["class_"] = ""
         kwargs["class_"] += " combobox"
         kwargs["data-multiple"] = True
-        return super(MultiReferenceField, self).widget(kwargs)
+        kwargs["data-caption"] = ",".join([str(item.name)
+                                           for item in self.data])
+        if self.data:
+            kwargs["value"] = ",".join([str(item.id) for item in self.data])
+        return super(MultiReferenceField, cls).widget(self, **kwargs)
 
     def process_data(self, valuelist):
         # process initialization data
-        self.data = []
         try:
+            self.data = []
             for value in valuelist:
                 if isinstance(value, self.reference_class):
                     self.data.append(value)
         except TypeError:
-            """valuelist is not iterable; ignore"""
+            self.data = None
 
     def process_formdata(self, valuelist):
         self.data = []

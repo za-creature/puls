@@ -7,7 +7,8 @@ from puls import app, paginate
 import flask
 
 
-@app.route("/admin/targets/", endpoint="manage_targets")
+@app.route("/admin/targets/", methods=["GET", "POST"],
+           endpoint="manage_targets")
 @app.route("/admin/targets/<int:page>/")
 @app.template("admin/targets/list.html")
 @app.logged_in
@@ -35,9 +36,9 @@ def search_targets():
                                       for item in results]})
 
 
-@app.route("/admin/targets/new", methods=["GET", "POST"],
+@app.route("/admin/targets/new/", methods=["GET", "POST"],
            endpoint="add_target")
-@app.route("/admin/targets/<id>/edit", methods=["GET", "POST"])
+@app.route("/admin/targets/<id>/edit/", methods=["GET", "POST"])
 @app.template("admin/targets/form.html")
 @app.logged_in
 def edit_target(id=None):

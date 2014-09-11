@@ -11,7 +11,7 @@ import wtforms as wtf
 
 
 @auto_modified
-class Connector(app.db.Document, Searchable):
+class Bus(app.db.Document, Searchable):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
     ]}
@@ -25,24 +25,24 @@ class Connector(app.db.Document, Searchable):
     modified = mge.DateTimeField(default=datetime.datetime.now)
 
 
-class ConnectorSpec(app.db.EmbeddedDocument):
-    connector = mge.ReferenceField(Connector, required=True)
-    count = mge.IntField(required=True)
+class BusField(ReferenceField):
+    reference_class = Bus
 
 
-class ConnectorField(ReferenceField):
-    reference_class = Connector
-
-
-class ConnectorSpecForm(flask_wtf.Form):
-    connector = ConnectorField("Connector")
-    count = wtf.IntegerField("Count")
-
-
-class ConnectorForm(flask_wtf.Form):
+class BusForm(flask_wtf.Form):
     name = wtf.TextField("Name", [wtf.validators.Required(),
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
 
     photo = PhotoField("Photo", [wtf.validators.InputRequired()])
+
+
+class Connector(app.db.EmbeddedDocument):
+    bus = mge.ReferenceField(Bus, required=True)
+    count = mge.IntField(required=True)
+
+
+class ConnectorForm(flask_wtf.Form):
+    bus = BusField("Bus")
+    count = wtf.IntegerField("Count")

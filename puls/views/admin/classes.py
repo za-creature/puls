@@ -7,7 +7,8 @@ from puls import app, paginate
 import flask
 
 
-@app.route("/admin/classes/", endpoint="manage_classes")
+@app.route("/admin/classes/", methods=["GET", "POST"],
+           endpoint="manage_classes")
 @app.route("/admin/classes/<int:page>/")
 @app.template("admin/classes/list.html")
 @app.logged_in

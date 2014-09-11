@@ -1,22 +1,22 @@
 {% extends "admin/base.html" %}
 
-{% set active_page = "connectors" %}
+{% set active_page = "buses" %}
 
 {% block heading %}
     <ol class="breadcrumb">
         <li><a href="{{ url_for("dashboard") }}">Admin</a></li>
-        <li class="active">Connectors</li>
+        <li class="active">Buses</li>
     </ol>
     <div class="row">
         <div class="col-sm-5 col-md-4 col-lg-3">
             <a class="btn btn-primary btn-block"
-               href="{{ url_for("add_connector") }}">
+               href="{{ url_for("add_bus") }}">
                 <i class="glyphicon-pro glyphicon-pro-circle-plus"></i>&nbsp;
-                New connector
+                New bus
             </a>
         </div>
         <div class="col-sm-7 col-md-8 col-lg-6 col-lg-offset-3">
-            <form action="{{ url_for("manage_connectors") }}"
+            <form action="{{ url_for("manage_buses") }}"
                   method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class="input-group">
@@ -24,7 +24,7 @@
                            class="form-control"
                            name="term"
                            value="{{ term }}"
-                           placeholder="Search connectors">
+                           placeholder="Search buses">
                     <span class="input-group-btn">
                         <button type="submit"
                                 class="btn btn-warning">Go!</button>
@@ -52,14 +52,14 @@
                 <td class="actions">
                     <div class="btn-group btn-group-sm">
                         <a class="btn btn-success"
-                           href="{{ url_for("edit_connector", id=item.id) }}">
+                           href="{{ url_for("edit_bus", id=item.id) }}">
                             <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
                             Edit
                         </a>
                         <a class="btn btn-danger confirm"
-                           href="{{ url_for("delete_connector", id=item.id) }}"
+                           href="{{ url_for("delete_bus", id=item.id) }}"
                            data-title="Confirm delete"
-                           data-content="Are you sure you wish to delete this connector? This action can not be undone!"
+                           data-content="Are you sure you wish to delete this bus? This action can not be undone!"
                         >
                             <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
                             Delete
@@ -70,7 +70,7 @@
         {% else %}
             <tr class="warning">
                 <td colspan="4">
-                    No connectors have been defined.
+                    No buses have been defined.
                 </td>
             </tr>
         {% endfor %}
