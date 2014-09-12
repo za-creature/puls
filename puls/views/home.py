@@ -1,10 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Config, Target, Supplier
-from puls.tasks import update_supplier
+from puls.models import Config, Target, Class
+from puls.tasks import generate_top
 from puls import app
-
-import flask
 
 
 @app.route("/")
@@ -33,6 +31,7 @@ def about():
 
 @app.route("/runtask")
 def runtask():
-    supplier = Supplier.objects.get_or_404(name="EMag")
-    update_supplier.delay(supplier)
+    cls = Class.objects.get_or_404(name="Storage")
+    generate_top.delay(cls)
+
     return "OK"

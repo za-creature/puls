@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.components import Component, ComponentField
 from puls.models.classes import Class, ClassField
+from puls.models.targets import TargetWeightSpec, TargetWeightField
 from puls.models import auto_modified, Searchable
 from puls import app
 
@@ -26,11 +27,13 @@ class Benchmark(app.db.Document, Searchable):
     name = mge.StringField(required=True, max_length=256)
     description = mge.StringField(default="", max_length=4096)
 
-    url = mge.StringField(required=True, max_length=256)
+    url = mge.StringField(max_length=256)
     cls = mge.ReferenceField(Class, required=True)
 
     factor = mge.FloatField(required=True)  # currently always 0
     exponent = mge.FloatField(required=True)  # currently always 1
+    weights = mge.ListField(mge.EmbeddedDocumentField(TargetWeightSpec))
+
     entries = mge.ListField(mge.EmbeddedDocumentField(BenchmarkEntry))
 
     # dates
@@ -49,11 +52,9 @@ class BenchmarkForm(flask_wtf.Form):
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
 
-    url = wtf.TextField("URL", [wtf.validators.InputRequired(),
-                                wtf.validators.Length(max=256)])
+    url = wtf.TextField("URL", [wtf.validators.Length(max=256)])
     cls = ClassField("Component Class", [wtf.validators.InputRequired()])
-
 
     factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
     exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
-
+    weights = TargetWeightField()

@@ -19,7 +19,7 @@ import wtforms as wtf
 @auto_modified
 class ExternalComponent(app.db.Document, Searchable):
     meta = {"indexes": [
-        [("supplier", 1), ("name", "text")],
+        [("supplier", 1), ("name", "text"), ("identifier", "text")],
     ]}
 
     # indexing
@@ -72,6 +72,7 @@ class Component(app.db.Document, Searchable):
 
     external = mge.ListField(mge.ReferenceField(ExternalComponent))
     metadata = mge.ListField(mge.EmbeddedDocumentField(ComponentMetadataSpec))
+    power = mge.FloatField(required=True)
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
@@ -91,8 +92,9 @@ class ComponentForm(flask_wtf.Form):
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
-    photo = PhotoField("Photo", [wtf.validators.InputRequired()])
+    photo = PhotoField("Photo", [wtf.validators.DataRequired()])
 
     classes = MultiClassField("Classes", [wtf.validators.InputRequired()])
     manufacturers = MultiManufacturerField("Manufacturers",
                                            [wtf.validators.InputRequired()])
+    power = wtf.FloatField("Power", [wtf.validators.InputRequired()])

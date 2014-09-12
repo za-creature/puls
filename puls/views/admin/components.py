@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals, division
 from puls.models import (Component, ComponentForm, ComponentMetadataSpec,
                          Connector, Bus, Supplier, ExternalComponent)
 from puls.compat import unquote_plus, str
-from puls import app, paginate
+from puls import app, paginate, AttributeDict
 
 import flask_wtf
 import wtforms as wtf
@@ -94,7 +94,7 @@ def edit_component(id=None):
                 count = int(counts[key])
                 if count < -10 or count > 10:
                     raise ValueError
-            except ValueError, IndexError:
+            except (ValueError, IndexError):
                 flask.abort(404)
             item.connectors.append(Connector(bus=bus, count=count))
 
@@ -116,7 +116,7 @@ def edit_component(id=None):
             "external": external_references}
 
 
-@app.route("/admin/components/<id>/metadata/", methods=["GET", "POST"])
+@app.route("/admin/components/<id>/meta/", methods=["GET", "POST"])
 @app.template("admin/components/metadata.html")
 @app.logged_in
 def edit_component_meta(id=None):
@@ -126,26 +126,28 @@ def edit_component_meta(id=None):
         pass
 
     def field_id(cls, meta):
-        return "{0}_{1}".format(str(cls.id),
-                                hashlib.md5(meta.encode("utf-8"))
-                                       .hexdigest())
+        return "f{0}_{1}".format(str(cls.id),
+                                 hashlib.md5(meta.encode("utf-8"))
+                                        .hexdigest())
 
     # build serial form
     for cls in item.classes:
         for meta in cls.metadata:
-            setattr(MetaForm, field_id(cls, meta.name),
-                    wtf.FloatField("{0} {1} ({2})".format(cls.name, meta.name,
-                                                          meta.unit),
-                                   [wtf.validators.Required()]))
+            field = wtf.FloatField("{0} {1}".format(cls.name, meta.name),
+                                   [wtf.validators.Required()])
+            setattr(MetaForm, field_id(cls, meta.name), field)
 
     # create serial defaults
-    default = {}
+    default = AttributeDict()
     for entry in item.metadata:
         for name, value in entry.values.items():
             default[field_id(entry.cls, name)] = value
-    default = type(b"DefaultMetadata", (object, ), default)()
 
+    # wtforms is gay
     form = MetaForm(obj=default)
+    for cls in item.classes:
+        for meta in cls.metadata:
+            getattr(form, field_id(cls, meta.name)).unit = meta.unit
 
     if form.validate_on_submit():
         # copy serial data to item

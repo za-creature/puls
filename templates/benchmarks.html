@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% set active_page = "components" %}
+{% set active_page = "benchmarks" %}
 
 {% block title %}
-    Components - Puls
+    Benchmarks - Puls
 {% endblock %}
 
 {% block contents %}
@@ -10,7 +10,7 @@
         {% for cls in classes %}
             <div class="col-xs-6 col-md-4 col-lg-3">
                 <div class="thumbnail">
-                    <a href="{{ url_for("class_", id=cls.id) }}">
+                    <a href="#">
                         <img src="{{ cls.photo.thumb_url }}" alt="...">
                         <br/>
                         <span class="caption">{{ cls.name }}</span>

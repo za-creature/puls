@@ -48,7 +48,7 @@ def has_main_menu(f):
     """Decorates a function to add the variables that are required by the Puls
     main menu. The behavior can be overridden by returning a Response object,
     in which case the decorator does nothing."""
-    from puls.models import Component, Manufacturer, Supplier
+    from puls.models import Component, Benchmark, Manufacturer, Supplier
 
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
@@ -59,6 +59,7 @@ def has_main_menu(f):
             context = {}
         context.update({
             "component_count": Component.objects().count(),
+            "benchmark_count": Benchmark.objects().count(),
             "manufacturer_count": Manufacturer.objects().count(),
             "supplier_count": Supplier.objects().count()
         })

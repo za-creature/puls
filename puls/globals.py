@@ -9,6 +9,16 @@ from puls.compat import range
 import math
 
 
+class AttributeDict(dict):
+    def __getattr__(self, key):
+        try:
+            return dict.__getitem__(self, key)
+        except KeyError:
+            raise AttributeError(key)
+    __setattr__ = dict.__setattr__
+    __delattr__ = dict.__delattr__
+
+
 class Pagination(object):
     def __init__(self, queryset, page, per_page):
         self.current = page

@@ -42,6 +42,6 @@ class ManufacturerForm(flask_wtf.Form):
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
 
-    photo = PhotoField("Photo", [wtf.validators.InputRequired()])
+    photo = PhotoField("Photo", [wtf.validators.DataRequired()])
     url = fmm.URLField("Website", [wtf.validators.Required(),
                                    wtf.validators.URL()])

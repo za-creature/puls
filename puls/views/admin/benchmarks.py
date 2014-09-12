@@ -56,7 +56,8 @@ def edit_benchmark(id=None):
         form.populate_obj(item)
         item.save()
         flask.flash("The benchmark was saved", "success")
-        return flask.redirect(flask.url_for("manage_benchmarks"))
+        return flask.redirect(flask.url_for("manage_benchmark_entries",
+                                            id=str(item.id)))
 
     return {"form": form,
             "item": item}

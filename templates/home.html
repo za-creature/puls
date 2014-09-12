@@ -9,21 +9,28 @@
     <div class="row">
         <div class="jumbotron">
             <h1>Welcome!</h1>
-            <p>Puls helps you build a better desktop computer from aftermarket parts (<a href="{{ url_for("about") }}">See how</a>).</p>
+            <p>Puls helps you build a better desktop computer from aftermarket parts<span class="hidden-xs"> (<a href="{{ url_for("about") }}">See how</a>)</span>.</p>
             <hr/>
             <form action="{{ url_for("generate") }}" method="post">
-                <div class="form-group">
+                <div class="form-group has-success">
                     <label>Just tell us what you'll be using it for:</label>
-                    <div class="btn-group btn-group-justified" data-toggle="buttons">
+                    <div class="btn-group btn-group-justified hidden-xs hidden-sm" data-toggle="buttons">
                         {% for target in targets %}
                             <label class="btn btn-success btn-lg
                                           {% if loop.index == 0 %}active{% endif %}"
                                    title="{{ target.description }}">
                                 <input type="radio" name="target" checked="checked"/>
                                     <i class="glyphicon-pro glyphicon-pro-{{ target.icon }}"></i>&nbsp;
-                                     {{ target.name }}
+                                    {{ target.name }}
                             </label>
                         {% endfor %}
+                    </div>
+                    <div class="hidden-md hidden-lg">
+                        <select class="form-control input-lg">
+                            {% for target in targets %}
+                                <option value="{{ target.id }}">{{ target.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
@@ -34,7 +41,7 @@
                                min="0"
                                max="1000000"
                                step="1"
-                               placeholder="Maximum budget"
+                               placeholder="Budget"
                                id="budget"/>
                         <input type="hidden" name="currency" value="RON"/>
                         <div class="input-group-btn">
@@ -56,13 +63,15 @@
                     <button type="submit" class="btn btn-primary btn-lg">Build!</button>
                 </div>
             </form>
-            <hr/>
-            <ul class="list-unstyled">
-                <li>* exchange rates are provided by the
-                    <a target="_blank" href="http://bnr.ro/">Romanian National Bank</a>
-                    (<a target="_blank" href="http://bnr.ro/nbrfxrates.xml">source</a>)
-                </li>
-            </ul>
+            <div class="hidden-xs">
+                <hr/>
+                <ul class="list-unstyled">
+                    <li>* exchange rates are provided by the
+                        <a target="_blank" href="http://bnr.ro/">Romanian National Bank</a>
+                        (<a target="_blank" href="http://bnr.ro/nbrfxrates.xml">source</a>)
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 {% endblock %}

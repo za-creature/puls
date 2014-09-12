@@ -37,46 +37,48 @@
 {% endblock %}
 
 {% block contents %}
-    <table class="table table-hover table-actions">
-        <tr>
-            <th>Name</th>
-            <th>Website</th>
-            <th>Created on</th>
-            <th>Last modified</th>
-            <th class="actions">Actions</th>
-        </tr>
-        {% for item in page %}
+    <div class="table-responsive">
+        <table class="table table-hover table-actions">
             <tr>
-                <td>{{ item.name }}</td>
-                <td><a href="{{ item.url }}"
-                       target="_blank">{{ item.url }}</a></td>
-                <td>{{ item.created|dateformat }}</td>
-                <td>{{ item.modified|dateformat }}</td>
-                <td class="actions">
-                    <div class="btn-group btn-group-sm">
-                        <a class="btn btn-success"
-                           href="{{ url_for("edit_supplier", id=item.id) }}">
-                            <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
-                            Edit
-                        </a>
-                        <a class="btn btn-danger confirm"
-                           href="{{ url_for("delete_supplier", id=item.id) }}"
-                           data-title="Confirm delete"
-                           data-content="Are you sure you wish to delete this supplier? This action can not be undone!"
-                        >
-                            <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
-                            Delete
-                        </a>
-                    </div>
-                </td>
+                <th>Name</th>
+                <th>Website</th>
+                <th>Created on</th>
+                <th>Last modified</th>
+                <th class="actions">Actions</th>
             </tr>
-        {% else %}
-            <tr class="warning">
-                <td colspan="5">
-                    No suppliers have been defined.
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    {{ macros.pagination(page) }}
+            {% for item in page %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td><a href="{{ item.url }}"
+                           target="_blank">{{ item.url }}</a></td>
+                    <td>{{ item.created|dateformat }}</td>
+                    <td>{{ item.modified|dateformat }}</td>
+                    <td class="actions">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-success"
+                               href="{{ url_for("edit_supplier", id=item.id) }}">
+                                <i class="glyphicon-pro glyphicon-pro-edit"></i>&nbsp;
+                                Edit
+                            </a>
+                            <a class="btn btn-danger confirm"
+                               href="{{ url_for("delete_supplier", id=item.id) }}"
+                               data-title="Confirm delete"
+                               data-content="Are you sure you wish to delete this supplier? This action can not be undone!"
+                            >
+                                <i class="glyphicon-pro glyphicon-pro-remove-2"></i>&nbsp;
+                                Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class="warning">
+                    <td colspan="5">
+                        No suppliers have been defined.
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {{ macros.pagination(page, "list_suppliers") }}
 {% endblock %}

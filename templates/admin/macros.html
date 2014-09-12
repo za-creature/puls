@@ -1,4 +1,4 @@
-{% macro pagination(page, caption="Showing results {start} - {end} out of {total}. Jump to page:") %}
+{% macro pagination(page, route, caption="Showing results {start} - {end} out of {total}. Jump to page:") %}
     {% if page.total and page.last > 1 %}
         {% if caption %}
             <div class="text-muted">{{ caption.format(start=page.start + 1,
@@ -7,7 +7,7 @@
         {% endif %}
         <ul class="pagination">
             {% if page.has_prev %}
-                <li><a href="{{ url_for("list_manufacturers", page=page.prev) }}">&laquo;</a></li>
+                <li><a href="{{ url_for(route, page=page.prev) }}">&laquo;</a></li>
             {% else %}
                 <li class="disabled"><span>&laquo;</span></li>
             {% endif %}
@@ -16,14 +16,14 @@
                     {% if number == page.current %}
                         <li class="active"><span>{{ number }}</span></li>
                     {% else %}
-                        <li><a href="{{ url_for("list_manufacturers", page=number) }}">{{ number }}</a></li>
+                        <li><a href="{{ url_for(route, page=number) }}">{{ number }}</a></li>
                     {% endif %}
                 {% else %}
                     <li class="disabled"><span>&hellip;</span></li>
                 {% endif %}
             {%- endfor %}
             {% if page.has_next %}
-                <li><a href="{{ url_for("list_manufacturers", page=page.next) }}">&raquo;</a></li>
+                <li><a href="{{ url_for(route, page=page.next) }}">&raquo;</a></li>
             {% else %}
                 <li class="disabled"><span>&raquo;</span></li>
             {% endif %}

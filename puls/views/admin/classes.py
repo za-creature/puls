@@ -81,7 +81,7 @@ def manage_class_meta(id):
 
 @app.route("/admin/classes/<id>/meta/new/", methods=["GET", "POST"],
            endpoint="add_class_meta")
-@app.route("/admin/classes/<id>/meta/edit/<name>/", methods=["GET", "POST"])
+@app.route("/admin/classes/<id>/meta/<name>/edit/", methods=["GET", "POST"])
 @app.template("admin/classes/metadata/form.html")
 @app.logged_in
 def edit_class_meta(id, name=None):
@@ -116,7 +116,7 @@ def edit_class_meta(id, name=None):
             "cls": cls}
 
 
-@app.route("/admin/classes/<id>/metadata/delete/<name>/")
+@app.route("/admin/classes/<id>/meta/<name>/delete/")
 @app.logged_in
 def delete_class_meta(id, name):
     cls = Class.objects.get_or_404(id=unquote_plus(id))

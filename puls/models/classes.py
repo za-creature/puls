@@ -32,6 +32,7 @@ class Class(app.db.Document, Searchable):  # this is so meta
     photo = mge.ReferenceField(Photo, reverse_delete_rule=mge.NULLIFY)
 
     metadata = mge.ListField(mge.EmbeddedDocumentField(Metadatum))
+    priority = mge.IntField(required=True)
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
@@ -51,9 +52,9 @@ class MetadatumForm(flask_wtf.Form):
                                     wtf.validators.Length(max=64)])
     unit = wtf.StringField("Unit", [wtf.validators.InputRequired(),
                                     wtf.validators.Length(max=16)])
+
     factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
     exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
-
     weights = TargetWeightField()
 
 
@@ -62,4 +63,5 @@ class ClassForm(flask_wtf.Form):
                                   wtf.validators.Length(max=256)])
     description = wtf.TextAreaField("Description",
                                     [wtf.validators.Length(max=4096)])
-    photo = PhotoField("Photo", [wtf.validators.InputRequired()])
+    photo = PhotoField("Photo", [wtf.validators.DataRequired()])
+    priority = wtf.IntegerField("Priority", [wtf.validators.InputRequired()])

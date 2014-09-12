@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-lg-8 col-lg-push-4">
+        <div class="btn-group btn-group-justified">
+            {% for t in targets %}
+                <a href="{{ route(target=t.id, sort=sort) }}"
+                   class="btn {% if t == target %}btn-success{% else %}btn-default{% endif %}"
+                >
+                    <i class="glyphicon-pro glyphicon-pro-{{ t.icon }}"></i>&nbsp;
+                    {{ t.name }}
+                </a>
+            {% endfor %}
+        </div>
+        <br class="hidden-lg">
+    </div>
+    <div class="col-lg-4 col-lg-pull-8">
+        <ul class="nav nav-tabs" role="tablist">
+            {% if sort == "performance" %}
+                <li class="active"><a>
+                    <i class="glyphicon-pro glyphicon-pro-podium"></i>&nbsp;
+                    Performance
+                </a></li>
+                <li><a href="{{ route(target=target.id, sort="value") }}">
+                    <i class="glyphicon-pro glyphicon-pro-coins"></i>&nbsp;
+                    Value
+                </a></li>
+            {% else %}
+                <li><a href="{{ route(target=target.id, sort="performance") }}">
+                    <i class="glyphicon-pro glyphicon-pro-podium"></i>&nbsp;
+                    Performance
+                </a></li>
+                <li class="active"><a>
+                    <i class="glyphicon-pro glyphicon-pro-coins"></i>&nbsp;
+                    Value
+                </a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<br/>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        {% for component in components %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="{{ url_for("component", id=component.id) }}">{{ component.name }}</a></td>
+                <td>5 stars</td>
+                <td>$$$</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>

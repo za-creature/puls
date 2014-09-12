@@ -79,8 +79,7 @@ class ReferenceField(wtf.HiddenField):
             self.data = None
 
     def process_formdata(self, valuelist):
-        if valuelist:
-            print("TRYTHY")
+        if valuelist and valuelist[0]:
             try:
                 id = str(valuelist[0])
                 self.data = self.reference_class.objects.get(id=id)
@@ -119,7 +118,7 @@ class MultiReferenceField(wtf.HiddenField):
 
     def process_formdata(self, valuelist):
         self.data = []
-        if valuelist:
+        if valuelist and valuelist[0]:
             try:
                 for id in str(valuelist[0]).split(","):
                     self.data.append(self.reference_class.objects.get(id=id))

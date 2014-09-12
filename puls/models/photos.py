@@ -82,7 +82,7 @@ class PhotoField(flask_wtf.file.FileField):
     @classmethod
     def widget(cls, self, **kwargs):
         id = kwargs.pop("id", self.id)
-        html =  "<input %s>" % wtf.widgets.html_params(
+        html = "<input %s>" % wtf.widgets.html_params(
             name=self.name,
             type="file",
             **kwargs
@@ -125,13 +125,15 @@ class PhotoField(flask_wtf.file.FileField):
 
     def process_upload(self, input):
         # set default name from filename if non-existent
-        secure_name = werkzeug.secure_filename(input.filename)
-        photo = Photo(id=bson.objectid.ObjectId())
+        photo = Photo(id=bson.objectid.ObjectId(),
+                      filename=werkzeug.secure_filename(input.filename))
 
         # save the original file
         try:
-            logging.info(photo.orig_path)
             input.save(photo.orig_path)
+            if not os.stat(photo.orig_path).st_size:
+                photo.delete_files()
+                return
         except Exception:
             raise wtf.ValidationError("Unable to save image.")
 

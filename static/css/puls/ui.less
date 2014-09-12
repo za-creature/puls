@@ -42,3 +42,24 @@
 .template {
     margin-bottom: 15px;
 }
+
+.thumbnail {
+    text-align: center;
+    font-size: 1.3em;
+    a {
+        display: block;
+        img {
+            height: 80px;
+
+            @media (min-width: @screen-sm-min) {
+                height: 100px;
+            }
+            @media (min-width: @screen-md-min) {
+                height: 120px;
+            }
+            @media (min-width: @screen-lg-min) {
+                height: 140px;
+            }
+        }
+    }
+}
