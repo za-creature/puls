@@ -1,16 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.tasks.suppliers import Supplier
+from puls.models.crawlers import SupplierCrawler
+from puls.compat import urlparse
 
 import bs4
-try:
-    import urllib.parse as urlparse
-    assert urlparse
-except ImportError:
-    import urlparse
 
 
-class EMag(Supplier):
+class EMag(SupplierCrawler):
     abstract = False
 
     def __init__(self):
@@ -67,10 +63,10 @@ class EMag(Supplier):
             raise Exception("No components found")
 
         # determine next page, if any
-        pages = page.select("div.products-pagination")
+        pages = page.select("div.listing-pagination")
         if not pages:
             return
-        current = pages[len(pages) - 1].select("span.pg.selected")
+        current = pages[len(pages) - 1].select("span.pagination-current")
         if not current:
             return
         next = current[0].find_next_siblings("a")

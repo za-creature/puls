@@ -33,7 +33,6 @@
             <tr>
                 <th>Name</th>
                 <th>Unit</th>
-                <th>Factor</th>
                 <th>Exponent</th>
                 <th class="actions">Actions</th>
             </tr>
@@ -41,7 +40,6 @@
                 <tr>
                     <td>{{ item.name }}</td>
                     <td>{{ item.unit }}</a></td>
-                    <td>{{ item.factor|round(2) }}</td>
                     <td>{{ item.exponent|round(2) }}</td>
                     <td class="actions">
                         <div class="btn-group btn-group-sm">
@@ -65,7 +63,7 @@
                 </tr>
             {% else %}
                 <tr class="warning">
-                    <td colspan="5">
+                    <td colspan="4">
                         No meta entries have been defined for this class.
                     </td>
                 </tr>

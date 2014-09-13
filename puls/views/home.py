@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Config, Target, Class
-from puls.tasks import generate_top
+from puls.models import Config, Target, Supplier, Class, Component
+from puls.tasks import crawl_supplier, generate_top
 from puls import app
 
 
@@ -31,7 +31,27 @@ def about():
 
 @app.route("/runtask")
 def runtask():
-    cls = Class.objects.get_or_404(name="Video card")
+    pcgarage = Supplier.objects.get_or_404(name="eMag")
+    crawl_supplier(pcgarage)
+
+    return "OK"
+
+
+@app.route("/runtask2")
+def runtask2():
+    cls = Class.objects.get(name="Storage")
     generate_top(cls)
+
+    return "OK"
+
+
+@app.route("/runtask3")
+def runtask3():
+    for component in Component.objects:
+        component.price = 0
+        for external in component.external:
+            component.price += external.price
+        component.price /= len(component.external)
+        component.save()
 
     return "OK"

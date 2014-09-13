@@ -14,6 +14,7 @@ import sys
 if sys.version_info < (3,):
     # python 2 imports
     from urllib import quote_plus, unquote_plus
+    import urlparse
     import __builtin__ as builtins
 
     # redefine python 2 symbols to their py3k equivalent
@@ -22,6 +23,7 @@ if sys.version_info < (3,):
 else:
     # python 3 imports
     from urllib.parse import quote_plus, unquote_plus
+    import urllib.parse as urlparse
     import builtins
 
     # python 3 symbols are already defined, but are not directly importable

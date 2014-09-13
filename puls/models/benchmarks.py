@@ -30,10 +30,9 @@ class Benchmark(app.db.Document, Searchable):
     url = mge.StringField(max_length=256)
     cls = mge.ReferenceField(Class, required=True)
 
-    factor = mge.FloatField(required=True)  # currently always 0
-    exponent = mge.FloatField(required=True)  # currently always 1
+    unit = mge.StringField(required=True, max_length=16)
+    exponent = mge.FloatField(required=True)
     weights = mge.ListField(mge.EmbeddedDocumentField(TargetWeightSpec))
-
     entries = mge.ListField(mge.EmbeddedDocumentField(BenchmarkEntry))
 
     # dates
@@ -55,6 +54,6 @@ class BenchmarkForm(flask_wtf.Form):
     url = wtf.TextField("URL", [wtf.validators.Length(max=256)])
     cls = ClassField("Component Class", [wtf.validators.InputRequired()])
 
-    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
+    unit = wtf.StringField("Unit", [wtf.validators.Length(max=16)])
     exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
     weights = TargetWeightField()

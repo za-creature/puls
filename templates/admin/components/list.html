@@ -43,15 +43,29 @@
         <table class="table table-hover table-actions">
             <tr>
                 <th>Name</th>
-                <th>Created on</th>
-                <th>Last modified</th>
+                <th>Class(es)</th>
+                <th>Manufacturer(s)</th>
                 <th class="actions">Actions</th>
             </tr>
             {% for item in page %}
                 <tr>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.created|dateformat }}</td>
-                    <td>{{ item.modified|dateformat }}</td>
+                    <td>
+                        {% for class in item.classes %}
+                            {%- if loop.index != 1 %},{% endif %}
+                            <a href="{{ url_for("edit_class", id=class.id) }}">{{ class.name }}</a>
+                        {%- else %}
+                            None
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for manufacturer in item.manufacturers %}
+                            {%- if loop.index != 1 %},{% endif %}
+                            <a href="{{ url_for("edit_manufacturer", id=manufacturer.id) }}">{{ manufacturer.name }}</a>
+                        {%- else %}
+                            None
+                        {% endfor %}
+                    </td>
                     <td class="actions">
                         <div class="btn-group btn-group-sm">
                             <a class="btn btn-success"

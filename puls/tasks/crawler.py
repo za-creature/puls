@@ -1,11 +1,13 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.tasks import suppliers
+from puls.models import crawlers
 from puls import app
 
+
+@app.task(name="puls.tasks.crawl_supplier")
 @app.task
-def update_supplier(supplier):
-    crawler_class = getattr(suppliers, supplier.cls)
-    assert issubclass(crawler_class, suppliers.Supplier)
+def crawl_supplier(supplier):
+    crawler_class = getattr(crawlers, supplier.cls)
+    assert issubclass(crawler_class, crawlers.SupplierCrawler)
     crawler = crawler_class()
     crawler.run(supplier)

@@ -1,18 +1,18 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models import ExternalComponent
-from puls import PulsTask, app
+from puls import app
 
 import collections
 import importlib
+import traceback
 import requests
 import pkgutil
-import logging
 import random
 import time
 
 
-class Supplier(object):
+class SupplierCrawler(object):
     def __init__(self):
         """Called to initialize the crawler."""
         self.http = requests.Session()
@@ -34,13 +34,13 @@ class Supplier(object):
             tries = app.config["CRAWLER_SETTINGS"]["tries"]
             while tries:
                 try:
-                    logging.debug("GET {0}".format(url))
+                    print("GET {0}".format(url))
                     r = requests.get(
                         url,
                         headers={"referer": self.referrer},
                         timeout=app.config["CRAWLER_SETTINGS"]["timeout"])
                 except requests.RequestException as e:
-                    logging.error("Got {0} while loading {1}".format(
+                    print("Got {0} while loading {1}".format(
                         e.__class__.__name__, url))
                 else:
                     self.referrer = r.url
@@ -51,22 +51,22 @@ class Supplier(object):
                         try:
                             self.handle(r.text, data)
                         except Exception:
-                            logging.exception("An unhandled exception occurred"
-                                              " while processing {0}" % (url))
+                            print("An unhandled exception occurred"
+                                  " while processing {0}".format(url))
+                            traceback.print_exc()
                         tries = 0
 
                     elif r.status_code // 100 == 5:
                         # some sort of server error; try again later if the
                         # retry limit is not exceeded
-                        logging.warning("Received {0} response while loading "
-                                        "{1}.".format(r.status_code, url))
+                        print("Received {0} response while loading "
+                              "{1}.".format(r.status_code, url))
                         tries -= 1
 
                     else:
                         # unsupported response status code; ignore but log
-                        logging.error("Unexpected {0} response code occurred "
-                                      "while loading {1}".format(r.status_code,
-                                                                 url))
+                        print("Unexpected {0} response code occurred "
+                              "while loading {1}".format(r.status_code, url))
                         tries = 0
 
                 # sleep until the next request is performed; to ensure
@@ -82,7 +82,7 @@ class Supplier(object):
             self.queue.append((url, data))
 
     def found(self, _id, name, price, stock, url):
-        logging.debug("Found component {0}".format(name))
+        print("Found component {0}".format(name.encode("ascii", "ignore")))
         ExternalComponent.objects(supplier=self.supplier,
                                   identifier=_id) \
                          .update_one(upsert=True,

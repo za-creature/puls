@@ -16,7 +16,6 @@ class Metadatum(app.db.EmbeddedDocument):
     name = mge.StringField(required=True, max_length=64)
     unit = mge.StringField(required=True, max_length=16)
 
-    factor = mge.FloatField(default=1)
     exponent = mge.FloatField(default=1)
     weights = mge.ListField(mge.EmbeddedDocumentField(TargetWeightSpec))
 
@@ -51,10 +50,7 @@ class MultiClassField(MultiReferenceField):
 class MetadatumForm(flask_wtf.Form):
     name = wtf.StringField("Name", [wtf.validators.InputRequired(),
                                     wtf.validators.Length(max=64)])
-    unit = wtf.StringField("Unit", [wtf.validators.InputRequired(),
-                                    wtf.validators.Length(max=16)])
-
-    factor = wtf.FloatField("Factor", [wtf.validators.InputRequired()])
+    unit = wtf.StringField("Unit", [wtf.validators.Length(max=16)])
     exponent = wtf.FloatField("Exponent", [wtf.validators.InputRequired()])
     weights = TargetWeightField()
 

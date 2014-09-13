@@ -83,7 +83,14 @@
             <div class="col-sm-8 col-md-9">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form.score(class_="form-control") }}
+                        {% if bench.unit %}
+                            <div class="input-group">
+                                {{ form.score(class_="form-control") }}
+                                <span class="input-group-addon">{{ bench.unit }}</span>
+                            </div>
+                        {% else %}
+                            {{ form.score(class_="form-control") }}
+                        {% endif %}
                     </div>
                     <div class="col-md-6 help-block">
                         {% for message in form.score.errors %}

@@ -15,5 +15,106 @@
         </div>
     </div>
     <br/>
-    {% include "top.html" %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-push-4">
+            <div class="btn-group btn-group-justified">
+                {% for t in targets %}
+                    <a href="{{ route(target=t.id, sort=sort) }}"
+                       class="btn {% if t == target %}btn-info{% else %}btn-default{% endif %}"
+                    >
+                        <i class="glyphicon-pro glyphicon-pro-{{ t.icon }}"></i>&nbsp;
+                        {{ t.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            <br class="hidden-lg">
+        </div>
+        <div class="col-lg-4 col-lg-pull-8">
+            <ul class="nav nav-tabs" role="tablist">
+                {% if sort == "performance" %}
+                    <li class="active"><a>
+                        <i class="glyphicon-pro glyphicon-pro-podium"></i>&nbsp;
+                        Performance
+                    </a></li>
+                    <li><a href="{{ route(target=target.id, sort="value") }}">
+                        <i class="glyphicon-pro glyphicon-pro-coins"></i>&nbsp;
+                        Value
+                    </a></li>
+                {% else %}
+                    <li><a href="{{ route(target=target.id, sort="performance") }}">
+                        <i class="glyphicon-pro glyphicon-pro-podium"></i>&nbsp;
+                        Performance
+                    </a></li>
+                    <li class="active"><a>
+                        <i class="glyphicon-pro glyphicon-pro-coins"></i>&nbsp;
+                        Value
+                    </a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <br/>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tr>
+                <th class="position">#</th>
+                <th>Component</th>
+                <th class="score">Score</th>
+                <th colspan="2">Average price</th>
+            </tr>
+            {% for component in components %}
+                <tr>
+                    <td class="position">{{ loop.index }}</td>
+                    <td><a href="{{ url_for("component", id=component.id) }}">{{ component.name }}</a></td>
+                    <td class="score">
+                        <div class="progress" style="margin-bottom:0">
+                            <div class="progress-bar
+                                        {% if component.score > 0.66 %}
+                                            progress-bar-success
+                                        {% elif component.score > 0.33 %}
+                                            progress-bar-warning
+                                        {% else %}
+                                            progress-bar-danger
+                                        {% endif %}"
+                                 title="{{ (100 * component.score)|round(2) }}% of best"
+                                 role="progressbar"
+                                 aria-valuemin="0"
+                                 aria-valuenow="60"
+                                 aria-valuemax="100"
+                                 style="width: {{ 100 * component.score }}%;">
+                          </div>
+                        </div>
+                    </td>
+                    <td class="price">
+                        {{ component.price|round(2) }} RON
+                    </td>
+                    <td>
+                        {% if component.external %}
+                            <div class="dropdown">
+                                <button class="btn btn-info btn-xs dropdown-toggle"
+                                        type="button"
+                                        data-toggle="dropdown">
+                                    <i class="glyphicon-pro glyphicon-pro-shopping-cart"></i>&nbsp;
+                                    Buy now
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                    {% for external in component.external %}
+                                        <li role="presentation">
+                                            <a role="menuitem"
+                                               tabindex="-1"
+                                               href="{{ external.url }}"
+                                               target="_blank"
+                                            >{{ external.supplier.name }} - {{ external.price }} RON</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

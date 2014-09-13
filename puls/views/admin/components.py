@@ -46,9 +46,9 @@ def search_external_components(id):
     supplier = Supplier.objects.get_or_404(id=unquote_plus(id))
     term = flask.request.args.get("term", "")
     if term:
-        results = ExternalComponent.search(term, supplier.id)
+        results = ExternalComponent.search(term, supplier)
     else:
-        results = ExternalComponent.objects(supplier=supplier.id).limit(100)
+        results = ExternalComponent.objects(supplier=supplier).limit(100)
 
     return flask.jsonify({"results": [{"id": str(item.id),
                                        "text": str(item.name)}

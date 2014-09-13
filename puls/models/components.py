@@ -8,7 +8,6 @@ from puls.models.photos import Photo, PhotoField
 from puls.models.buses import Connector
 from puls.models import (auto_modified, Searchable, ReferenceField,
                          MultiReferenceField)
-from puls.compat import str
 from puls import app
 
 import mongoengine as mge
@@ -43,7 +42,7 @@ class ExternalComponent(app.db.Document, Searchable):
     def search(self, query, supplier, limit=100):
         col = self._get_collection()
         result = col.find({"$text": {"$search": query},
-                           "supplier": str(supplier.id)},
+                           "supplier": supplier.id},
                           {"score": {"$meta": "textScore"}}) \
                     .sort([("score", {"$meta": "textScore"})]) \
                     .limit(limit)
@@ -83,6 +82,7 @@ class Component(app.db.Document, Searchable):
     external = mge.ListField(mge.ReferenceField(ExternalComponent))
     metadata = mge.ListField(mge.EmbeddedDocumentField(ComponentMetadataSpec))
     power = mge.FloatField(required=True)
+    price = mge.FloatField(required=False)
     score = mge.ListField(mge.EmbeddedDocumentField(ComponentPerformanceSpec))
 
     # dates

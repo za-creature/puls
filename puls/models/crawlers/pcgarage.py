@@ -1,18 +1,13 @@
 # coding=utf8
 from __future__ import absolute_import, unicode_literals, division
-from puls.tasks.suppliers import Supplier
+from puls.models.crawlers import SupplierCrawler
+from puls.compat import urlparse
 
 import bs4
 import re
 
-try:
-    import urllib.parse as urlparse
-    assert urlparse
-except ImportError:
-    import urlparse
 
-
-class PCGarage(Supplier):
+class PCGarage(SupplierCrawler):
     abstract = False
 
     def __init__(self):
@@ -68,7 +63,7 @@ class PCGarage(Supplier):
             stock = "instock" in availability or \
                 "insupplierstock" in availability
 
-            self.store_component(uniq, name, price, stock, url)
+            self.found(uniq, name, price, stock, url)
 
         if failed:
             raise Exception("No components found")

@@ -8,13 +8,14 @@ import itertools
 import numpy
 
 
+@app.task(name="puls.tasks.generate_top")
 @app.task
 def generate_top(cls):
     # create theoretical tests and component map
     theoretical = {}
     for meta in cls.metadata:
         theoretical[meta.name] = Benchmark(name=meta.name,
-                                           factor=meta.factor,
+                                           unit=meta.unit,
                                            exponent=meta.exponent,
                                            weights=meta.weights,
                                            entries=[])
@@ -58,7 +59,6 @@ def generate_top(cls):
         component.score = []
 
     for target in Target.objects():
-        print(target.name)
         row = 1
         for benchmark in itertools.chain(theoretical, practical):
             factor = benchmark.factor_map[target.id]
@@ -80,16 +80,23 @@ def generate_top(cls):
         scores = numpy.linalg.lstsq(A, B)[0]
 
         normal = max(scores)
+        value_normal = 0
         for index, score in enumerate(scores):
-            print(components[index].name, score / normal)
-            components[index].score.append(ComponentPerformanceSpec(
+            component = components[index]
+            if component.price > 0.01:
+                ratio = score / component.price
+                if ratio > value_normal:
+                    value_normal = ratio
+
+        for index, score in enumerate(scores):
+            component = components[index]
+            ratio = score / component.price if component.price > 0.01 else 0
+            component.score.append(ComponentPerformanceSpec(
                 cls=cls,
                 target=target,
                 performance=score / normal,
-                value=0
+                value=ratio / value_normal
             ))
-        print(normal)
-        print("---------")
 
     # holy shit that was hard
     for component in components:
