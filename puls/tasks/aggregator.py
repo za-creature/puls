@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
-from puls.models import Benchmark, Component, BenchmarkEntry
+from puls.models import (Benchmark, Component, Target, BenchmarkEntry,
+                         ComponentPerformanceSpec)
 from puls import app
 
 import itertools
@@ -9,7 +10,7 @@ import numpy
 
 @app.task
 def generate_top(cls):
-    # create theoretical tests
+    # create theoretical tests and component map
     theoretical = {}
     for meta in cls.metadata:
         theoretical[meta.name] = Benchmark(name=meta.name,
@@ -19,7 +20,10 @@ def generate_top(cls):
                                            entries=[])
 
     components = [c for c in Component.objects(classes=cls)]
-    for component in components:
+    comp_map = {}
+
+    for index, component in enumerate(components):
+        comp_map[component.id] = index
         for meta in component.metadata:
             if meta.cls != cls:
                 continue
@@ -32,23 +36,61 @@ def generate_top(cls):
     # load practical tests
     practical = Benchmark.objects(cls=cls)
 
-    benchmarks = itertools.chain(theoretical, practical)
-
-    # determine system matrix size
+    # determine system matrix size and premultiply scores
     cols = len(components)
     rows = 1
-    for benchmark in benchmarks:
+    for benchmark in itertools.chain(theoretical, practical):
+        benchmark.factor_map = {}
+        for weight in benchmark.weights:
+            benchmark.factor_map[weight.target.id] = weight.value
+
+        for entry in benchmark.entries:
+            entry.score **= benchmark.exponent
         rows += len(benchmark.entries) - 1
 
-    # build overdetermined system
+    # build & solve an overdetermined system for each target
     A = numpy.zeros((rows, cols))
     B = numpy.zeros(rows)
 
-    A[0][0] = 1
-    B[0] = 1
+    A[0][0] = B[0] = 1
 
-    row = 1
-    for benchmark in benchmarks:
-        prev = None
-        for curr in benchmark.entries:
-            pass
+    for component in components:
+        component.score = []
+
+    for target in Target.objects():
+        print(target.name)
+        row = 1
+        for benchmark in itertools.chain(theoretical, practical):
+            factor = benchmark.factor_map[target.id]
+
+            prev = None
+            for curr in benchmark.entries:
+                if prev:
+                    prev_pos = comp_map[prev.component.id]
+                    curr_pos = comp_map[curr.component.id]
+
+                    score_normalizer = factor / (curr.score + prev.score)
+
+                    A[row][prev_pos] = curr.score * score_normalizer
+                    A[row][curr_pos] = -prev.score * score_normalizer
+                    row += 1
+                prev = curr
+
+        # normalize scores
+        scores = numpy.linalg.lstsq(A, B)[0]
+
+        normal = max(scores)
+        for index, score in enumerate(scores):
+            print(components[index].name, score / normal)
+            components[index].score.append(ComponentPerformanceSpec(
+                cls=cls,
+                target=target,
+                performance=score / normal,
+                value=0
+            ))
+        print(normal)
+        print("---------")
+
+    # holy shit that was hard
+    for component in components:
+        component.save()

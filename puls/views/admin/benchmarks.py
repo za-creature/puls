@@ -54,6 +54,8 @@ def edit_benchmark(id=None):
         if not item:
             item = Benchmark()
         form.populate_obj(item)
+        item.entries.sort(key=lambda e: e.score ** item.exponent,
+                          reverse=True)
         item.save()
         flask.flash("The benchmark was saved", "success")
         return flask.redirect(flask.url_for("manage_benchmark_entries",
@@ -109,6 +111,8 @@ def edit_benchmark_entry(id, component=None):
             index = -1
 
         form.populate_obj(bench.entries[index])
+        bench.entries.sort(key=lambda e: e.score ** bench.exponent,
+                           reverse=True)
         bench.save()
         flask.flash("The benchmark entry was saved", "success")
         return flask.redirect(flask.url_for("manage_benchmark_entries",
@@ -131,6 +135,8 @@ def delete_benchmark_entry(id, component):
         flask.abort(404)
 
     bench.entries.pop(index)
+    bench.entries.sort(key=lambda e: e.score ** bench.exponent,
+                       reverse=True)
     bench.save()
     flask.flash("The benchmark entry has been deleted!", "warning")
     return flask.redirect(flask.url_for("manage_benchmark_entries",

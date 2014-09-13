@@ -33,6 +33,7 @@ class Class(app.db.Document, Searchable):  # this is so meta
 
     metadata = mge.ListField(mge.EmbeddedDocumentField(Metadatum))
     priority = mge.IntField(required=True)
+    weights = mge.ListField(mge.EmbeddedDocumentField(TargetWeightSpec))
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)
@@ -65,3 +66,4 @@ class ClassForm(flask_wtf.Form):
                                     [wtf.validators.Length(max=4096)])
     photo = PhotoField("Photo", [wtf.validators.DataRequired()])
     priority = wtf.IntegerField("Priority", [wtf.validators.InputRequired()])
+    weights = TargetWeightField("Weights")

@@ -1,5 +1,14 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+    {% if item %}
+        {{ item.name }}
+    {% else %}
+        New component
+    {% endif %}
+    - Puls
+{% endblock %}
+
 {% set active_page = "components" %}
 
 {% block heading %}

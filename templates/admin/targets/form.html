@@ -1,5 +1,14 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+    {% if item %}
+        {{ item.name }}
+    {% else %}
+        New target
+    {% endif %}
+    - Puls
+{% endblock %}
+
 {% set active_page = "targets" %}
 
 {% block heading %}

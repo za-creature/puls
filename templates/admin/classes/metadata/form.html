@@ -1,5 +1,14 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+    {% if item %}
+        {{ item.name }}
+    {% else %}
+        New meta
+    {% endif %}
+    - {{ cls.name }} - Puls
+{% endblock %}
+
 {% set active_page = "classes" %}
 
 {% block heading %}

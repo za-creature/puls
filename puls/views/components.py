@@ -27,13 +27,33 @@ def class_(id, target=None, sort="performance"):
     else:
         target = Target.objects.get_or_404(id=target)
 
+    if sort != "performance":
+        sort = "value"
+
     cls = Class.objects.get_or_404(id=unquote_plus(id))
+    components = [c for c in Component.objects(__raw__={
+        "score": {
+            "$elemMatch": {
+                "cls": cls.id,
+                "target": target.id
+            }
+        }
+    }).order_by("-score.{0}".format(sort)).limit(100)]
+
+    for component in components:
+        for entry in component.score:
+            if entry.target == target:
+                component.score = getattr(entry, sort)
+                break
+        else:
+            flask.abort(500)
+
     return {"active_page": "components",
             "cls": cls,
             "targets": Target.objects,
             "target": target,
             "sort": sort,
-            "components": Component.objects,
+            "components": components,
             "route": functools.partial(flask.url_for, "components_by_class",
                                        id=str(cls.id))}
 

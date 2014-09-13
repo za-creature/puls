@@ -31,7 +31,7 @@ def about():
 
 @app.route("/runtask")
 def runtask():
-    cls = Class.objects.get_or_404(name="Storage")
-    generate_top.delay(cls)
+    cls = Class.objects.get_or_404(name="Video card")
+    generate_top(cls)
 
     return "OK"

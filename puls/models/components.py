@@ -1,10 +1,11 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models.manufacturers import Manufacturer, MultiManufacturerField
-from puls.models.buses import Connector
 from puls.models.suppliers import Supplier
+from puls.models.targets import Target
 from puls.models.classes import Class, MultiClassField
 from puls.models.photos import Photo, PhotoField
+from puls.models.buses import Connector
 from puls.models import (auto_modified, Searchable, ReferenceField,
                          MultiReferenceField)
 from puls.compat import str
@@ -54,10 +55,19 @@ class ComponentMetadataSpec(app.db.EmbeddedDocument):
     values = mge.DictField(mge.FloatField)
 
 
+class ComponentPerformanceSpec(app.db.EmbeddedDocument):
+    cls = mge.ReferenceField(Class)
+    target = mge.ReferenceField(Target)
+    performance = mge.FloatField(default=0.0)
+    value = mge.FloatField(default=0.0)
+
+
 @auto_modified
 class Component(app.db.Document, Searchable):
     meta = {"indexes": [
         [("name", "text"), ("description", "text")],
+        [("score.cls", 1), ("score.target", 1), ("score.performance", -1)],
+        [("score.cls", 1), ("score.target", 1), ("score.value", -1)],
     ]}
 
     name = mge.StringField(required=True, max_length=256)
@@ -73,6 +83,7 @@ class Component(app.db.Document, Searchable):
     external = mge.ListField(mge.ReferenceField(ExternalComponent))
     metadata = mge.ListField(mge.EmbeddedDocumentField(ComponentMetadataSpec))
     power = mge.FloatField(required=True)
+    score = mge.ListField(mge.EmbeddedDocumentField(ComponentPerformanceSpec))
 
     # dates
     created = mge.DateTimeField(default=datetime.datetime.now)

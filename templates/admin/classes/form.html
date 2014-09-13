@@ -1,5 +1,14 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+    {% if item %}
+        {{ item.name }}
+    {% else %}
+        New class
+    {% endif %}
+    - Puls
+{% endblock %}
+
 {% set active_page = "classes" %}
 
 {% block heading %}
@@ -107,6 +116,33 @@
                 </div>
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="col-sm-4 col-md-3 control-label"><em>Target weights:</em></label>
+        </div>
+
+        {% for weight in form.weights %}
+            <div class="form-group
+                        {% if weight["value"].errors %}has-error{% endif %}">
+                <input type="hidden"
+                       name="{{ weight["target"].name }}"
+                       value="{{ weight["target"].data.id }}"/>
+                <label class="col-sm-4 col-md-3 control-label"
+                       for="{{ weight["value"].id }}">{{ weight["target"].data.name }}</label>
+                <div class="col-sm-8 col-md-9">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ weight["value"](class_="form-control") }}
+                        </div>
+                        <div class="col-md-6 help-block">
+                            {% for message in weight["value"].errors %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
 
         <hr/>
         <div class="form-group">

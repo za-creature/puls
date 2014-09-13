@@ -1,5 +1,14 @@
 {% extends "admin/base.html" %}
 
+{% block title %}
+    {% if item %}
+        {{ item.name }}
+    {% else %}
+        New entry
+    {% endif %}
+     - {{ bench.name }} - Puls
+{% endblock %}
+
 {% set active_page = "benchmarks" %}
 
 {% block heading %}

@@ -3,7 +3,7 @@
         <div class="btn-group btn-group-justified">
             {% for t in targets %}
                 <a href="{{ route(target=t.id, sort=sort) }}"
-                   class="btn {% if t == target %}btn-success{% else %}btn-default{% endif %}"
+                   class="btn {% if t == target %}btn-info{% else %}btn-default{% endif %}"
                 >
                     <i class="glyphicon-pro glyphicon-pro-{{ t.icon }}"></i>&nbsp;
                     {{ t.name }}
@@ -40,12 +40,36 @@
 
 <div class="table-responsive">
     <table class="table table-striped">
+        <tr>
+            <th style="text-align: right">#</th>
+            <th>Component</th>
+            <th style="text-align: center">Score</th>
+            <th style="text-align: right">Price</th>
+        </tr>
         {% for component in components %}
             <tr>
-                <td>{{ loop.index }}</td>
+                <td style="text-align: right">{{ loop.index }}</td>
                 <td><a href="{{ url_for("component", id=component.id) }}">{{ component.name }}</a></td>
-                <td>5 stars</td>
-                <td>$$$</td>
+                <td style="width: 200px">
+                    <div class="progress" style="margin-bottom:0">
+                        <div class="progress-bar
+                                    {% if component.score > 0.66 %}
+                                        progress-bar-success
+                                    {% elif component.score > 0.33 %}
+                                        progress-bar-warning
+                                    {% else %}
+                                        progress-bar-danger
+                                    {% endif %}"
+                             title="{{ (100 * component.score)|round(2) }}% of best"
+                             role="progressbar"
+                             aria-valuemin="0"
+                             aria-valuenow="60"
+                             aria-valuemax="100"
+                             style="width: {{ 100 * component.score }}%;">
+                      </div>
+                    </div>
+                </td>
+                <td style="text-align: right">{{ (2357 * component.score)|round(2) }} RON</td>
             </tr>
         {% endfor %}
     </table>
