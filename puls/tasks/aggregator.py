@@ -5,6 +5,7 @@ from puls.models import (Benchmark, Component, Target, BenchmarkEntry,
 from puls import app
 
 import itertools
+import random
 import numpy
 
 
@@ -33,6 +34,8 @@ def generate_top(cls):
                                        score=meta.values[key])
                 theoretical[key].entries.append(entry)
     theoretical = theoretical.values()
+    for benchmark in theoretical:
+        benchmark.entries.sort(key=lambda e: e.score ** -benchmark.exponent)
 
     # load practical tests
     practical = Benchmark.objects(cls=cls)
@@ -45,8 +48,6 @@ def generate_top(cls):
         for weight in benchmark.weights:
             benchmark.factor_map[weight.target.id] = weight.value
 
-        for entry in benchmark.entries:
-            entry.score **= benchmark.exponent
         rows += len(benchmark.entries) - 1
 
     # build & solve an overdetermined system for each target
@@ -69,10 +70,13 @@ def generate_top(cls):
                     prev_pos = comp_map[prev.component.id]
                     curr_pos = comp_map[curr.component.id]
 
-                    score_normalizer = factor / (curr.score + prev.score)
+                    curr_score = 1
+                    prev_score = (prev.score/curr.score) ** benchmark.exponent
 
-                    A[row][prev_pos] = curr.score * score_normalizer
-                    A[row][curr_pos] = -prev.score * score_normalizer
+                    score_normalizer = factor / (curr_score + prev_score)
+
+                    A[row][prev_pos] = curr_score * score_normalizer
+                    A[row][curr_pos] = -prev_score * score_normalizer
                     row += 1
                 prev = curr
 

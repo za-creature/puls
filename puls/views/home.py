@@ -39,7 +39,7 @@ def runtask():
 
 @app.route("/runtask2")
 def runtask2():
-    cls = Class.objects.get(name="Storage")
+    cls = Class.objects.get(name="Memory")
     generate_top(cls)
 
     return "OK"
