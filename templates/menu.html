@@ -20,14 +20,14 @@
         </a>
     </li>
     <li{% if active_page == "manufacturers" %} class="active"{% endif %}>
-        <a href="">
+        <a href="{{ url_for("manufacturers") }}">
             <i class="glyphicon-pro glyphicon-pro-blacksmith"></i>&nbsp;
             Manufacturers
             <span class="badge pull-right">{{ manufacturer_count }}</span>
         </a>
     </li>
     <li{% if active_page == "suppliers" %} class="active"{% endif %}>
-        <a href="">
+        <a href="{{ url_for("suppliers") }}">
             <i class="glyphicon-pro glyphicon-pro-shopping-cart"></i>&nbsp;
             Suppliers
             <span class="badge pull-right">{{ supplier_count }}</span>

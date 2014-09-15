@@ -57,7 +57,7 @@ def generate_top(cls):
     A[0][0] = B[0] = 1
 
     for component in components:
-        component.score = []
+        component.score = [scr for scr in component.score if scr.cls != cls]
 
     for target in Target.objects():
         row = 1

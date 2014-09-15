@@ -1,8 +1,11 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals, division
 from puls.models import Config, Target, Supplier, Class, Component
-from puls.tasks import crawl_supplier, generate_top
+from puls.tasks import crawl_supplier, generate_top, generate_system
 from puls import app
+
+import datetime
+import flask
 
 
 @app.route("/")
@@ -15,11 +18,16 @@ def home():
             "targets": Target.objects()}
 
 
-@app.route("/generate/")
-@app.template("home.html")
+@app.route("/generate/", methods=["GET", "POST"])
+@app.template("system.html")
 @app.has_main_menu
 def generate():
-    pass
+    target = Target.objects.get_or_404(id=str(flask.request.form["target"]))
+    budget = int(flask.request.form["budget"])
+    return {"target": target,
+            "budget": budget,
+            "timestamp": datetime.datetime.now(),
+            "system": generate_system(target, budget)}
 
 
 @app.route("/about/")
@@ -39,10 +47,18 @@ def runtask():
 
 @app.route("/runtask2")
 def runtask2():
-    cls = Class.objects.get(name="Memory")
-    generate_top(cls)
+    result = ""
+    for cls in Class.objects:
+        result += cls.name + " "
+        try:
+            generate_top(cls)
+            result += "OK"
+        except Exception:
+            import traceback
+            result += "FAIL"
+        result += "<br/>"
 
-    return "OK"
+    return result
 
 
 @app.route("/runtask3")

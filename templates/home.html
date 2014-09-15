@@ -12,6 +12,9 @@
             <p>Puls helps you build a better desktop computer from aftermarket parts<span class="hidden-xs"> (<a href="{{ url_for("about") }}">See how</a>)</span>.</p>
             <hr/>
             <form action="{{ url_for("generate") }}" method="post">
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
                 <div class="form-group has-success">
                     <label>Just tell us what you'll be using it for:</label>
                     <div class="btn-group btn-group-justified hidden-xs hidden-sm" data-toggle="buttons">
@@ -19,7 +22,10 @@
                             <label class="btn btn-success btn-lg
                                           {% if loop.index == 0 %}active{% endif %}"
                                    title="{{ target.description }}">
-                                <input type="radio" name="target" checked="checked"/>
+                                <input type="radio"
+                                       name="target"
+                                       checked="checked"
+                                       value="{{ target.id }}"/>
                                     <i class="glyphicon-pro glyphicon-pro-{{ target.icon }}"></i>&nbsp;
                                     {{ target.name }}
                             </label>
@@ -42,7 +48,8 @@
                                max="1000000"
                                step="1"
                                placeholder="Budget"
-                               id="budget"/>
+                               id="budget"
+                               name="budget"/>
                         <input type="hidden" name="currency" value="RON"/>
                         <div class="input-group-btn">
                             <button type="button"

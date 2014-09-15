@@ -68,7 +68,7 @@
                     <td class="position">{{ loop.index }}</td>
                     <td><a href="{{ url_for("component", id=component.id) }}">{{ component.name }}</a></td>
                     <td class="score">
-                        <div class="progress" style="margin-bottom:0">
+                        <div class="progress">
                             <div class="progress-bar
                                         {% if component.score > 0.66 %}
                                             progress-bar-success
@@ -79,11 +79,8 @@
                                         {% endif %}"
                                  title="{{ (100 * component.score)|round(2) }}% of best"
                                  role="progressbar"
-                                 aria-valuemin="0"
-                                 aria-valuenow="60"
-                                 aria-valuemax="100"
                                  style="width: {{ 100 * component.score }}%;">
-                          </div>
+                            </div>
                         </div>
                     </td>
                     <td class="price">

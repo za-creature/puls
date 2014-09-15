@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% set active_page = "home" %}
+
+{% block title %}
+    Puls
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="jumbotron">
+            <h1>Your configuration</h1>
+        </div>
+        <h2>Build details:</h2>
+        <dl class="dl-horizontal">
+            <dt>Target:</dt>
+            <dd>{{ target.name }}</dd>
+            <dt>Budget:</dt>
+            <dd>{{ budget }} RON</dd>
+            <dt>Generated on:</dt>
+            <dd>{{ timestamp|dateformat }}</dd>
+            <dt>System ID:</dt>
+            <dd>#541206e3231040244c9966cb (<a href="#">permalink</a>)</dd>
+        </dl>
+
+        <h2>Components:</h2>
+        <div class="table-responsive">
+            <table class="table table-border">
+                <tr class="odd">
+                    <th></th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th coass="score-small">Score</th>
+                    <th class="price">Price</th>
+                    <th class="buy"></th>
+                </tr>
+                {% for component in system.components %}
+                    {% if loop.index % 2 == 0 %}
+                        {% set rowclass = "class=\"odd\""|safe %}
+                    {% else %}
+                        {% set rowclass = "" %}
+                    {% endif %}
+                    {% set rowspan = "rowspan=\"{0}\"".format(component.classes|length)|safe %}
+
+                    <tr {{ rowclass }}>
+                        <td {{ rowspan }}
+                            class="position mid">1x</td>
+                        <td {{ rowspan }}
+                            class="mid"
+                        >
+                            <a href="/components/5412eb27231040307462238e/">
+                                {{ component.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="label label-info">{{ component.classes[0].name }}</span>
+                        </td>
+                        <td class="score-small">
+                            {% set value = 0 %}
+                            {% for score in component.score %}
+                                {% if score.cls == component.classes[0] and
+                                      score.target == target %}
+                                    {% set value = score.performance %}
+                                    <div class="progress">
+                                        <div class="progress-bar
+                                                    {% if value > 0.66 %}
+                                                        progress-bar-success
+                                                    {% elif value > 0.33 %}
+                                                        progress-bar-warning
+                                                    {% else %}
+                                                        progress-bar-danger
+                                                    {% endif %}"
+                                             title="{{ (100 * value)|round(2) }}% of best"
+                                             role="progressbar"
+                                             style="width: {{ 100 * value }}%;">
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td {{ rowspan }}
+                            class="price mid"
+                        >{{ component.price|round(2) }}&nbsp;RON</td>
+                        <td {{ rowspan }}
+                            class="buy mid">
+                            {% if component.external %}
+                                <div class="dropdown">
+                                    <button class="btn btn-info btn-xs dropdown-toggle"
+                                            type="button"
+                                            data-toggle="dropdown">
+                                        <i class="glyphicon-pro glyphicon-pro-shopping-cart"></i>&nbsp;
+                                        Buy now
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                        {% for external in component.external %}
+                                            <li role="presentation">
+                                                <a role="menuitem"
+                                                   tabindex="-1"
+                                                   href="{{ external.url }}"
+                                                   target="_blank"
+                                                >{{ external.supplier.name }} - {{ external.price }} RON</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% for cls in component.classes[1:] %}
+                        <tr {{ rowclass }}>
+                            <td>
+                                <span class="label label-info">{{ cls.name }}</span>
+                            </td>
+                            <td class="score-small">
+                                {% for score in component.score %}
+                                    {% if score.cls == cls and
+                                          score.target == target %}
+                                        {% set value = score.performance %}
+                                        <div class="progress">
+                                            <div class="progress-bar
+                                                        {% if value > 0.66 %}
+                                                            progress-bar-success
+                                                        {% elif value > 0.33 %}
+                                                            progress-bar-warning
+                                                        {% else %}
+                                                            progress-bar-danger
+                                                        {% endif %}"
+                                                 title="{{ (100 * value)|round(2) }}% of best"
+                                                 role="progressbar"
+                                                 style="width: {{ 100 * value }}%;">
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+                <tr{% if system.components|length % 2 %} class="odd"{% endif %}>
+                {% set value = system.performance / system.components|length %}
+                    <th></th>
+                    <th colspan="2">Total:</th>
+                    <th class="score-small">
+                        <div class="progress">
+                            <div class="progress-bar
+                                        {% if value > 0.66 %}
+                                            progress-bar-success
+                                        {% elif value > 0.33 %}
+                                            progress-bar-warning
+                                        {% else %}
+                                            progress-bar-danger
+                                        {% endif %}"
+                                 title="{{ (100 * value)|round(2) }}% of best"
+                                 role="progressbar"
+                                 style="width: {{ 100 * value }}%;">
+                            </div>
+                        </div>
+                    </th>
+                    <th class="price">{{ system.price }}</th>
+                    <th></th>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

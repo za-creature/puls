@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set active_page = "suppliers" %}
+
+{% block title %}
+    {{ supplier.name }} - Puls
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>{{ supplier.name }}</h2>
+            <p>{{ supplier.description }}</p>
+            <br/>
+            <a class="btn btn-lg btn-warning"
+               href="{{ supplier.url }}"
+               target="_blank">Visit website</a>
+        </div>
+        <div class="col-sm-4">
+            <img class="img-responsive" src="{{ supplier.photo.web_url }}"/>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set active_page = "manufacturers" %}
+
+{% block title %}
+    Manufacturers - Puls
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        {% for manufacturer in manufacturers %}
+            <div class="col-xs-6 col-md-4 col-lg-3">
+                <div class="thumbnail">
+                    <a href="{{ url_for("manufacturer", id=manufacturer.id) }}">
+                        <img src="{{ manufacturer.photo.thumb_url }}" alt="...">
+                        <br/>
+                        <span class="caption">{{ manufacturer.name }}</span>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
