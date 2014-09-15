@@ -7,7 +7,7 @@
 
 {% block contents %}
     <div class="row">
-        {% for supplier in suppliers %}
+        {% for supplier in page %}
             <div class="col-xs-6 col-md-4 col-lg-3">
                 <div class="thumbnail">
                     <a href="{{ url_for("supplier", id=supplier.id) }}">
@@ -18,5 +18,6 @@
                 </div>
             </div>
         {% endfor %}
+        {{ macros.pagination(page, "suppliers") }}
     </div>
 {% endblock %}

@@ -27,7 +27,7 @@ class Pagination(object):
         self.total = queryset.count()
 
         self.start = (page - 1) * per_page
-        self.end = page * per_page
+        self.end = min(self.total, page * per_page)
 
         self.items = queryset[self.start:self.end]
 

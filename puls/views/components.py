@@ -48,8 +48,7 @@ def class_(id, target=None, sort="performance"):
         else:
             flask.abort(500)
 
-    return {"active_page": "components",
-            "cls": cls,
+    return {"cls": cls,
             "targets": Target.objects,
             "target": target,
             "sort": sort,

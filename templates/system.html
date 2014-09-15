@@ -13,13 +13,13 @@
         <h2>Build details:</h2>
         <dl class="dl-horizontal">
             <dt>Target:</dt>
-            <dd>{{ target.name }}</dd>
+            <dd>{{ system.target.name }}</dd>
             <dt>Budget:</dt>
-            <dd>{{ budget }} RON</dd>
+            <dd>{{ system.budget }} {{ system.currency }}</dd>
             <dt>Generated on:</dt>
-            <dd>{{ timestamp|dateformat }}</dd>
+            <dd>{{ system.created|dateformat }}</dd>
             <dt>System ID:</dt>
-            <dd>#541206e3231040244c9966cb (<a href="#">permalink</a>)</dd>
+            <dd>#{{ system.id }} (<a href="{{ url_for("system", id=system.id) }}">permalink</a>)</dd>
         </dl>
 
         <h2>Components:</h2>
@@ -30,7 +30,7 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th coass="score-small">Score</th>
-                    <th class="price">Price</th>
+                    <th class="price">Average price</th>
                     <th class="buy"></th>
                 </tr>
                 {% for component in system.components %}
@@ -58,7 +58,7 @@
                             {% set value = 0 %}
                             {% for score in component.score %}
                                 {% if score.cls == component.classes[0] and
-                                      score.target == target %}
+                                      score.target == system.target %}
                                     {% set value = score.performance %}
                                     <div class="progress">
                                         <div class="progress-bar
@@ -79,7 +79,7 @@
                         </td>
                         <td {{ rowspan }}
                             class="price mid"
-                        >{{ component.price|round(2) }}&nbsp;RON</td>
+                        >{{ (component.price * currency)|round(2) }}&nbsp;{{ system.currency }}</td>
                         <td {{ rowspan }}
                             class="buy mid">
                             {% if component.external %}
@@ -91,14 +91,14 @@
                                         Buy now
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                    <ul class="dropdown-menu" role="menu">
                                         {% for external in component.external %}
                                             <li role="presentation">
                                                 <a role="menuitem"
                                                    tabindex="-1"
                                                    href="{{ external.url }}"
                                                    target="_blank"
-                                                >{{ external.supplier.name }} - {{ external.price }} RON</a>
+                                                >{{ external.supplier.name }} - {{ (external.price * currency)|round(2) }} {{ system.currency }}</a>
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -114,7 +114,7 @@
                             <td class="score-small">
                                 {% for score in component.score %}
                                     {% if score.cls == cls and
-                                          score.target == target %}
+                                          score.target == system.target %}
                                         {% set value = score.performance %}
                                         <div class="progress">
                                             <div class="progress-bar
@@ -156,7 +156,7 @@
                             </div>
                         </div>
                     </th>
-                    <th class="price">{{ system.price }}</th>
+                    <th class="price">{{ (system.price * currency)|round(2) }} {{ system.currency }}</th>
                     <th></th>
                 </tr>
             </table>

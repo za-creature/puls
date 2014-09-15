@@ -50,17 +50,20 @@
                                placeholder="Budget"
                                id="budget"
                                name="budget"/>
-                        <input type="hidden" name="currency" value="RON"/>
-                        <div class="input-group-btn">
+                        <div class="input-group-btn btn-dropdown">
+                            <input type="hidden"
+                                   name="currency"
+                                   value="RON"/>
                             <button type="button"
                                     class="btn btn-warning dropdown-toggle btn-lg"
                                     data-toggle="dropdown">
-                                <span class="currency">RON</span>*&nbsp;
+                                <span class="caption">RON</span>*&nbsp;
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                 {% for currency, rate in rates|dictsort %}
-                                    <li title="1 {{ currency }} = {{ (1/rate)|round(4) }} RON"><a href="#">{{ currency }}</a></li>
+                                    <li title="1 {{ currency }} = {{ (1/rate)|round(4) }} RON"><a href="#"
+                                    data-value="{{ currency }}">{{ currency }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
