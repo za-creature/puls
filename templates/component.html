@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set active_page = "components" %}
+
+{% block title %}
+    {{ component.name }} - Puls
+{% endblock %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>{{ component.name }}</h2>
+            <p>{{ component.description }}</p>
+            <br/>
+            <dl class="dl-horizontal">
+                {% for entry in component.metadata %}
+                    {% for meta in entry.cls.metadata %}
+                        <dt>{{ entry.cls.name }} {{ meta.name }}</dt>
+                        <dd>{{ entry.values[meta.name] }} {{ meta.unit }}</dd>
+                    {% endfor %}
+                {% endfor %}
+            </dl>
+        </div>
+        <div class="col-sm-4">
+            <img class="img-responsive" src="{{ component.photo.web_url }}"/>
+        </div>
+    </div>
+{% endblock %}

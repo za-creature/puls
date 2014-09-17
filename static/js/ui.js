@@ -130,7 +130,11 @@ jQuery(function($)
     $("body").on("click", ".btn-delete", function(e) {
         $(this).parents(".template").remove();
         e.preventDefault();
-    })
+    });
+
+    $(window).on("resize", function() {
+        $(".embed-frame").height($(window).height());
+    }).trigger("resize");
 
     registerAll($("body"));
 });

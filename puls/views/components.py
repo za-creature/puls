@@ -61,4 +61,4 @@ def class_(id, target=None, sort="performance"):
 @app.template("component.html")
 @app.has_main_menu
 def component(id):
-    pass
+    return {"component": Component.objects.get_or_404(id=unquote_plus(id))}

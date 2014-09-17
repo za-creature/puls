@@ -12,13 +12,13 @@
             <span class="badge pull-right">{{ component_count }}</span>
         </a>
     </li>
-    <li{% if active_page == "benchmarks" %} class="active"{% endif %}>
+    <!--li{% if active_page == "benchmarks" %} class="active"{% endif %}>
         <a href="#">
             <i class="glyphicon-pro glyphicon-pro-charts"></i>&nbsp;
             Benchmarks
             <span class="badge pull-right">{{ benchmark_count }}</span>
         </a>
-    </li>
+    </li-->
     <li{% if active_page == "manufacturers" %} class="active"{% endif %}>
         <a href="{{ url_for("manufacturer_index") }}">
             <i class="glyphicon-pro glyphicon-pro-blacksmith"></i>&nbsp;

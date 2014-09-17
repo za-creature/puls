@@ -17,26 +17,19 @@
                        value="{{ csrf_token() }}">
                 <div class="form-group has-success">
                     <label>Just tell us what you'll be using it for:</label>
-                    <div class="btn-group btn-group-justified hidden-xs hidden-sm" data-toggle="buttons">
+                    <div class="btn-group btn-group-justified" data-toggle="buttons">
                         {% for target in targets %}
                             <label class="btn btn-success btn-lg
-                                          {% if loop.index == 0 %}active{% endif %}"
+                                          {% if loop.index == 1 %}active{% endif %}"
                                    title="{{ target.description }}">
                                 <input type="radio"
                                        name="target"
-                                       checked="checked"
+                                       {% if loop.index == 1 %}checked="checked"{% endif %}
                                        value="{{ target.id }}"/>
                                     <i class="glyphicon-pro glyphicon-pro-{{ target.icon }}"></i>&nbsp;
                                     {{ target.name }}
                             </label>
                         {% endfor %}
-                    </div>
-                    <div class="hidden-md hidden-lg">
-                        <select class="form-control input-lg">
-                            {% for target in targets %}
-                                <option value="{{ target.id }}">{{ target.name }}</option>
-                            {% endfor %}
-                        </select>
                     </div>
                 </div>
                 <div class="form-group">

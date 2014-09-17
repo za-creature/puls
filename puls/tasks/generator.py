@@ -83,7 +83,7 @@ class System(object):
             return False
 
         # duplicate PSU check
-        if component.power < 0:
+        if self.power > 0 and component.power < 0:
             return False
 
         # all tests pass
@@ -114,7 +114,7 @@ class BoundedHeap(object):
                 # ... and the current item is better than the worst item
                 # evict the worst item, granting it's slot to the current item
                 # return the worst item to allow it to be added to another heap
-                return heapq.heappushpop(self.data, (score, item))[0]
+                return heapq.heappushpop(self.data, (score, item))[1]
 
 
 class PerformanceHeap(BoundedHeap):
@@ -184,7 +184,6 @@ def generate_system(target, budget):
     max = 0
     best = None
     for _, system in itertools.chain(*[heap.data for heap in heaps]):
-        print(system)
         if system.performance > max:
             max = system.performance
             best = system

@@ -47,7 +47,7 @@
                         <td {{ rowspan }}
                             class="mid"
                         >
-                            <a href="/components/5412eb27231040307462238e/">
+                            <a href="{{ url_for("component", id=component.id) }}">
                                 {{ component.name }}
                             </a>
                         </td>
@@ -137,7 +137,7 @@
                     {% endfor %}
                 {% endfor %}
                 <tr{% if system.components|length % 2 %} class="odd"{% endif %}>
-                {% set value = system.performance / system.components|length %}
+                {% set value = system.performance %}
                     <th></th>
                     <th colspan="2">Total:</th>
                     <th class="score-small">

@@ -24,12 +24,10 @@ def generate():
     target = Target.objects.get_or_404(id=str(flask.request.form["target"]))
     budget = int(flask.request.form["budget"])
     currency = flask.request.form["currency"]
-    print(flask.request.form)
 
     rates = Config.get("exchange", {})
     rates["RON"] = 1
 
-    print(budget / rates[currency])
     system = generate_system(target, budget / rates[currency])
     if system:
         entry = System(target=target,
