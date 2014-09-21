@@ -47,31 +47,38 @@ def timeformat_to_regex(timeformat):
 
 
 class BooleanField(wtforms.fields.BooleanField):
-    pass
+    def js_args(self):
+        return [self.false_values]
 
 
 class DateField(wtforms.fields.html5.DateField):
-    pass
+    def js_args(self):
+        return [self.format, self.gettext("Not a valid date.")]
 
 
 class DateTimeField(wtforms.fields.html5.DateTimeField):
-    pass
+    def js_args(self):
+        return [self.format, self.gettext("Not a valid date and / or time.")]
 
 
 class DateTimeLocalField(wtforms.fields.html5.DateTimeLocalField):
-    pass
+    def js_args(self):
+        return [self.format, self.gettext("Not a valid date and / or time.")]
 
 
 class DecimalField(wtforms.fields.DecimalField):
-    pass
+    def js_args(self):
+        return self.gettext("Not a valid decimal value.")
 
 
 class DecimalRangeField(wtforms.fields.html5.DecimalRangeField):
-    pass
+    def js_args(self):
+        return self.gettext("Not a valid decimal range.")
 
 
 class EmailField(wtforms.fields.html5.EmailField):
-    pass
+    def js_args(self):
+        return []
 
 
 class FieldList(wtforms.fields.FieldList):
@@ -83,7 +90,8 @@ class FileField(flask_wtf.file.FileField):
 
 
 class FloatField(wtforms.fields.FloatField):
-    pass
+    def js_args(self):
+        return self.gettext("Not a valid float value.")
 
 
 class FormField(wtforms.fields.FormField):
@@ -91,19 +99,23 @@ class FormField(wtforms.fields.FormField):
 
 
 class HiddenField(wtforms.fields.HiddenField):
-    pass
+    def js_args(self):
+        return []
 
 
 class IntegerField(wtforms.fields.html5.IntegerField):
-    pass
+    def js_args(self):
+        return self.gettext("Not a valid integer value.")
 
 
 class IntegerRangeField(wtforms.fields.html5.IntegerRangeField):
-    pass
+    def js_args(self):
+        return self.gettext("Not a valid integer range.")
 
 
 class PasswordField(wtforms.fields.PasswordField):
-    pass
+    def js_args(self):
+        return []
 
 
 class RadioField(wtforms.fields.RadioField):
@@ -111,35 +123,55 @@ class RadioField(wtforms.fields.RadioField):
 
 
 class SearchField(wtforms.fields.html5.SearchField):
-    pass
+    def js_args(self):
+        return []
 
 
 class SelectField(wtforms.fields.SelectField):
-    pass
+    def js_args(self):
+        if self.coerce is int:
+            coerce_mode = "int"
+        elif self.coerce is float:
+            coerce_mode = "float"
+        else:
+            coerce_mode = "str"
+        return [coerce_mode, self.gettext("Invalid Choice: could not coerce.")]
 
 
 class SelectMultipleField(wtforms.fields.SelectMultipleField):
-    pass
-
+    def js_args(self):
+        if self.coerce is int:
+            coerce_mode = "int"
+        elif self.coerce is float:
+            coerce_mode = "float"
+        else:
+            coerce_mode = "str"
+        return [coerce_mode, self.gettext("Invalid choice(s): one or more "
+                                          "values could not be coerced.")]
 
 class SubmitField(wtforms.fields.SubmitField):
-    pass
+    def js_args(self):
+        return []
 
 
 class StringField(wtforms.fields.StringField):
-    pass
+    def js_args(self):
+        return []
 
 
 class TelField(wtforms.fields.html5.TelField):
-    pass
+    def js_args(self):
+        return []
 
 
 TextField = StringField
 
 
 class TextAreaField(wtforms.fields.TextAreaField):
-    pass
+    def js_args(self):
+        return []
 
 
 class URLField(wtforms.fields.html5.URLField):
-    pass
+    def js_args(self):
+        return []

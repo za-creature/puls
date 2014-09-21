@@ -12,6 +12,33 @@ function bool(value) {
 }
 
 
+function coerce(value, type, message) {
+    if(type == "int") {
+        var pattern = /^[\+\-]?\d+$/,
+            converter = parseInt;
+    }
+    else if(type == "float") {
+        var pattern = /^[\-\+]?[0-9]*\.?[0-9]+([eE][\-\+]?[0-9]+)?$/,
+            converter = parseFloat;
+    }
+    else {
+        // Only `int` and `float` values may be coerced.
+        return value;
+    }
+
+    if(!value.match(pattern))
+        throw new ValidationError(message);
+    return converter(value);
+}
+
+
+function ValidationWarning(message) {
+    this.name = "ValidationWarning";
+    this.message = message;
+}
+ValidationWarning.prototype = new Error;
+
+
 function ValidationError(message) {
     this.name = "ValidationError";
     this.message = message;
@@ -48,7 +75,7 @@ var validators = {
 
     EqualTo: function(field_name, message, invalid_field_message) {
         return function(form, field) {
-            var other = form[field_name]
+            var other = form._fields_map[field_name]
             if(typeof(other) == "undefined")
                 throw new ValidationError(invalid_field_message)
             if(field.data != other.data)
@@ -87,7 +114,8 @@ var validators = {
 
     Length: function(min, max, message) {
         if(min == -1 && max == -1)
-            throw new Error("At least one of `min` or `max` must be specified.");
+            throw new Error("At least one of `min` or `max` " +
+                            "must be specified.");
         if(max != -1 && min > max)
             throw new Error("`min` cannot be more than `max`.");
 
@@ -107,7 +135,8 @@ var validators = {
 
     NumberRange: function(min, max, message) {
         if(min === null && max === null)
-            throw new Error("At least one of `min` or `max` must be specified.");
+            throw new Error("At least one of `min` or `max` " +
+                            "must be specified.");
         if(max !== null && min !== null && min > max)
             throw new Error("`min` cannot be more than `max`.");
 
@@ -162,9 +191,11 @@ validators.MacAddress = function(message) {
 } 
 
 validators.URL = function(require_tld, message) {
-    var regex = "^[a-z]+://([^/:]+|([0-9]{1,3}\\.){3}[0-9]{1,3})(:[0-9]+)?(\\/.*)?$";
+    var regex = "^[a-z]+://([^/:]+|([0-9]{1,3}\\.){3}" +
+                "[0-9]{1,3})(:[0-9]+)?(\\/.*)?$";
     if(require_tld)
-        regex = "^[a-z]+://([^/:]+\\.[a-z]{2,10}|([0-9]{1,3}\\.){3}[0-9]{1,3})(:[0-9]+)?(\\/.*)?$";
+        regex = "^[a-z]+://([^/:]+\\.[a-z]{2,10}|([0-9]{1,3}\\.){3}" +
+                "[0-9]{1,3})(:[0-9]+)?(\\/.*)?$";
 
     return validators.Regex(regex, "i", message);
 }
@@ -177,68 +208,63 @@ validators.UUID = function(message) {
 
 function Form(fields, prefix) {
     var self = this;
+    self.state = "ok";
+    self.messages = {};
 
     self._prefix = prefix;
-    self._errors = null;
     self._fields = [];
     self._fields_map = {};
 
     fields.forEach(function(entry) {
         var name = entry[0],
             unbound_field = entry[1];
-        field = unbound_field.bind(self, name, prefix);
+        field = unbound_field.bind(self, name);
         self._fields.push(name);
         self._fields_map[name] = field;
     });
 
-    self.process = function() {
-        self._fields.forEach(function(name) {
-            var field = self._fields_map[name];
-            field.process();
-        });
-    }
-
     self.validate = function(extra_validators) {
-        self._errors = null;
-        success = true;
+        self.messages = {};
+        self.state = "ok";
+
         self._fields.forEach(function(name) {
             var field = self._fields_map[name],
-                extra = null;
+                extra = [];
             if(
-                    typeof(extra_validators) == "object" &&
-                    typeof(extra_validators[name]) == "function"
-            )
-                extra = extra_validators[name];
+                    // extra_validators must be a dictionary but ...
+                    typeof(extra_validators) == "object" && (
+                        // ... values must either be functions ...
+                        typeof(extra_validators[name]) == "function" || (
+                            // ... or non-empty lists
+                            typeof(extra_validators[name]) == "object" &&
+                            extra_validators[name].length
+                        )
+                    )
+            ) {
+                // however field.validate always expects a list of callables
+                if(typeof(extra_validators[name]) == "function")
+                    extra = [extra_validators[name]];
+                else
+                    extra = extra_validators[name];
+            }
 
-            if(!bool(field.validate(self, extra)))
-                success = false;
+            field.validate(self, extra);
+            if(field.messages.length) {
+                // either `error` or `warning`; update state unless the current
+                // form state is already `error`.
+                self.messages[name] = field.messages;
+                if(self.state != "error")
+                    self.state = field.state;
+            }
         });
-        return success;
+        return self.state != "error";
     }
-}
-
-
-function coerce(value, type, message) {
-    if(type == "int") {
-        var pattern = /^[\+\-]?\d+$/,
-            converter = parseInt;
-    }
-    else if(type == "float") {
-        var pattern = /^[\-\+]?[0-9]*\.?[0-9]+([eE][\-\+]?[0-9]+)?$/,
-            converter = parseFloat;
-    }
-    else
-        throw new ValidationError("Only `int` and `float` values may be coerced.");
-
-    if(!value.match(pattern))
-        throw new ValidationError(message);
-    return converter(value);
 }
 
 
 var fields = {
     BooleanField: function(false_values) {
-        return function(field) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
 
             if(widget.checked) {
@@ -253,7 +279,7 @@ var fields = {
     },
     DateField: function(format, message) {
         var pattern = new RegExp(format, "");
-        return function(field) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [widget.value];
 
@@ -270,7 +296,7 @@ var fields = {
 
     },
     FloatField: function(message) {
-        return function(field) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [widget.value];
             field.data = coerce(widget.value, "float", message);
@@ -280,7 +306,7 @@ var fields = {
 
     },
     IntegerField: function(message) {
-        return function(field) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [widget.value];
             field.data = coerce(widget.value, "int", message);
@@ -289,28 +315,28 @@ var fields = {
     RadioField: function() {
         
     },
-    SelectField: function(coerce, message) {
-        return function(field) {
+    SelectField: function(coerce_mode, message) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [widget.value];
-            field.data = coerce(widget.value, coerce, message);
+            field.data = coerce(widget.value, coerce_mode, message);
         }
     },
-    SelectMultipleField: function(coerce, message) {
-        return function(field) {
+    SelectMultipleField: function(coerce_mode, message) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [];
             field.data = [];
             widget.options.forEach(function(option) {
                 if(option.selected) {
                     field.raw_data.push(option.value);
-                    field.data.push(coerce(option.value, coerce, message));
+                    field.data.push(coerce(option.value, coerce_mode, message));
                 }
             });
         }
     },
     StringField: function() {
-        return function(field) {
+        return function(form, field) {
             var widget = document.getElementById(field.id);
             field.raw_data = [widget.value];
             field.data = widget.value;
@@ -347,22 +373,62 @@ fields.TextAreaField = fields.StringField;
 fields.URLField = fields.StringField;
 
 
-function Field(type, validators, id) {
+function Field(type, args, validators_, id) {
     var self = this;
 
+    self.id = id;
     self.type = type;
+    self.messages = [];
+    self.state = "ok";
+
     self.raw_data = null;
     self.data = null;
-    self.validators = validators;
 
-    self.bind = function() {
-    }
-
-    self.process = function() {
-
-    }
+    self.validators = [fields[type].call(args)];
+    validators_.forEach(function(spec) {
+        self.validators.push(validators[spec[0]].call(spec.slice(1)));
+    });
 
     self.validate = function(form, extra_validators) {
+        self.messages = [];
+        self.state = "ok"
 
+        try {
+            validators.concat(extra_validators).forEach(function(validator) {
+                try {
+                    validator(form, self);
+                }
+                catch(e) {
+                    if(e instanceof ValidationWarning) {
+                        // on warning, switch state only if the current state
+                        // was not error 
+                        if(self.state != "error") {
+                            self.messages.push(e.message);
+                            self.state = "warning";
+                        }
+                    }
+                    else if(e instanceof ValidationError) {
+                        // on error, clear any warning messages and switch
+                        // state to error
+                        if(self.state == "warning")
+                            self.messages = [];
+                        self.messages.push(e.message);
+                        self.state = "error";
+                    }
+                    else if(e instanceof StopValidation) {
+                        // on stop validation, clear any previous messages,
+                        // switch state to error and stop validation chain
+                        self.messages = [e.message];
+                        self.state = "error";
+                        throw e;
+                    }
+                    else throw e;
+                }
+            });
+        }
+        catch(e) {
+            if(!(e instanceof StopValidation))
+                throw e;
+        }
     }
 }
